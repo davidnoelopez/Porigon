@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		5551AD16180304FA00B07964 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5551AD15180304FA00B07964 /* main.cpp */; };
 		5551AD18180304FA00B07964 /* Porigon.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5551AD17180304FA00B07964 /* Porigon.1 */; };
+		5551AD201803050400B07964 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5551AD1E1803050400B07964 /* GLUT.framework */; };
+		5551AD211803050400B07964 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5551AD1F1803050400B07964 /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +30,8 @@
 		5551AD12180304FA00B07964 /* Porigon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Porigon; sourceTree = BUILT_PRODUCTS_DIR; };
 		5551AD15180304FA00B07964 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		5551AD17180304FA00B07964 /* Porigon.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Porigon.1; sourceTree = "<group>"; };
+		5551AD1E1803050400B07964 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		5551AD1F1803050400B07964 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +39,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5551AD201803050400B07964 /* GLUT.framework in Frameworks */,
+				5551AD211803050400B07964 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +50,8 @@
 		5551AD09180304FA00B07964 = {
 			isa = PBXGroup;
 			children = (
+				5551AD1E1803050400B07964 /* GLUT.framework */,
+				5551AD1F1803050400B07964 /* OpenGL.framework */,
 				5551AD14180304FA00B07964 /* Porigon */,
 				5551AD13180304FA00B07964 /* Products */,
 			);
