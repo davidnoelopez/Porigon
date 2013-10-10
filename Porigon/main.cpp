@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(400, 400);
-	glutCreateWindow("Cubo de colores ");
+	glutCreateWindow("Porigon");
     // Para que OpenGl reconozca la profundidad en el eje Z
 	glEnable(GL_DEPTH_TEST);
     glEnable( GL_POINT_SMOOTH );
