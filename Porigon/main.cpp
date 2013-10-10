@@ -34,7 +34,8 @@ void time(int v)
 }
 
 void dibujaDot(){
-    
+    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+    glPointSize( 20.0 );
     if(xd!=0 && yd!=0){
         xa=xa+(xd-xa)/10;
         ya=ya+(yd-ya)/10;
@@ -47,7 +48,7 @@ void dibujaDot(){
 
 void dotExplode(){
     glPointSize(es);
-    es+=0.8;
+    es+=0.4;
     if(es>=50){
         trans-=0.005;
     }
@@ -61,10 +62,6 @@ void dotExplode(){
         es=20;
         trans=0.20;
     }
-    
-    glPointSize( 20.0 );
-    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-    
 }
 
 void shoot(){
@@ -81,6 +78,7 @@ void shoot(){
 
 
 void dibuja() {
+    glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
     dibujaDot();
@@ -132,7 +130,12 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
     switch (key)
     {
         case ' ':
-            explode=1; xe=xa; ye=ya; break;
+            if ( explode == 0 ) {
+                explode=1;
+                xe=xa;
+                ye=ya;
+            }
+            break;
         case 'a':
             direction=1; explode=1; xb=xa; yb=ya; xe=xa; ye=ya; break;
         case 'w':
