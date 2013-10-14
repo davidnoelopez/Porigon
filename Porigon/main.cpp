@@ -21,21 +21,18 @@ int anguloX=0;
 int anguloY=0;
 int anguloZ=0;
 int explode=0;
+int bullet=0;
 int direction=0;
-int bullets=0;
-float xY, yY, xZ,yZ, x, y, xd, yd, xa, xb, yb, ya, xe, ye, es=20, trans=0.2;
+float xY, yY, xZ,yZ, x, y, xd, yd, xa, xb, yb, ya, xe, ye, es=20, trans=0.55;
 int x1=0, x2=0,y1=0,y2=0;
 int	screenWidth = 400, screenHeight = 400;
 
-void time(int v)
-{
-    glutPostRedisplay();
-    glutTimerFunc(10,time,1);
-}
+
 
 void dibujaDot(){
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     glPointSize( 20.0 );
+    
     if(xd!=0 && yd!=0){
         xa=xa+(xd-xa)/10;
         ya=ya+(yd-ya)/10;
@@ -46,60 +43,49 @@ void dibujaDot(){
     
 }
 
+//Se crea explocion
 void dotExplode(){
+    //se da el tamaño del punto
     glPointSize(es);
-    es+=0.4;
     if(es>=50){
-        trans-=0.005;
+        trans-=0.03;        //calcula transparencia
     }
-    glBegin(GL_POINTS);
+    es+=0.5;                //calcula tamaño
     glColor4f( 1.0f, 1.0f, 1.0f, trans);
-    glVertex3f(xe, ye, 0);
+    glBegin(GL_POINTS);
+    glVertex2d(xe, ye);
 	glEnd();
     
     if(trans<=0){
         explode=0;
         es=20;
-        trans=0.20;
+        trans=0.55;
     }
 }
 
 void shoot(){
     glColor3f( 1.0f, 1.0f, 1.0f );
-    glBegin(GL_LINE);
+    
     if(direction == 1 && xb > 0){
+        glBegin(GL_LINE);
         glVertex2f( xb, yb);
         glVertex2f( xb-2, yb);
-        xb-=5;
+        xb-=2;
+        glEnd();
     }
-    glEnd();
+    
     glFlush();
 }
 
-
-void dibuja() {
-    glutSetCursor(GLUT_CURSOR_NONE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPushMatrix();
-    dibujaDot();
-    glPopMatrix();
-    if(explode==1){
-        glPushMatrix();
-        dotExplode();
-        glPopMatrix();
-    }
-    shoot();
-    glutSwapBuffers();
-}
-
-
 void reshape (int a, int h)
 {
+    screenHeight = h;
+    screenWidth = a;
     glViewport(0,0, a, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //Sistema de coordenadas en 3D
-    glOrtho(-200.0, 200, -200, 200, -200, 200 ); //izq, der, abajo, arriba, cerca, lejos
+    glOrtho(-screenWidth/2, screenWidth/2, -screenHeight/2, screenHeight/2, -200, 200 ); //izq, der, abajo, arriba, cerca, lejos
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(0, 0, 20, 0, 0, 0, 0, 1, 0);
@@ -110,11 +96,11 @@ void myMouse(int button, int state, int mouseX, int mouseY)
 {
     x = mouseX;
     y = screenHeight - mouseY;
-    //    if (button == GLUT_LEFT_BUTTON){
-    //        explode=1;
-    //        xe=xa;
-    //        ye=ya;
-    //    }
+        if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && explode == 0){
+            explode=1;
+            xe=xa;
+            ye=ya;
+        }
     //    else if (button == GLUT_RIGHT_BUTTON){
     //        anguloZ+=10;
     //        x2=x;
@@ -137,7 +123,15 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
             }
             break;
         case 'a':
-            direction=1; explode=1; xb=xa; yb=ya; xe=xa; ye=ya; break;
+            if (bullet == 0) {
+                direction=1;
+                bullet=1;
+                xb=xa;
+                yb=ya;
+                xe=xa;
+                ye=ya;
+            }
+            break;
         case 'w':
             direction=2; break;
         case 'd':
@@ -152,8 +146,8 @@ void myPasMouse(int mouseX, int mouseY)
     x = mouseX;
     y = screenHeight - mouseY;
     glColor3f( 1.0f, 1.0f, 1.0f );
-    xd=x-200;
-    yd=y-200;
+    xd=x-screenWidth/2;
+    yd=y-screenHeight/2;
     
 }
 
@@ -162,6 +156,38 @@ void tecla (unsigned char t, int x, int y)
     
     if (t == 27 || t == 'q' || t=='Q') exit(0);
 }
+
+void time(int v)
+{
+    
+    glutPostRedisplay();
+    glutTimerFunc(20,time,1);
+}
+
+void dibuja() {
+    glutSetCursor(GLUT_CURSOR_NONE);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glPushMatrix();
+    dibujaDot();
+    //glPopMatrix();
+    if(explode){
+        //glPushMatrix();
+        dotExplode();
+        //glPopMatrix();
+    }
+    if (bullet) {
+        shoot();
+    }
+    
+
+    glBegin(GL_LINE);
+    glVertex2f( -200, 0);
+    glVertex2f( 200, 0);
+    glEnd();
+    glFlush();
+    glutSwapBuffers();
+}
+
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
@@ -174,7 +200,7 @@ int main(int argc, char** argv)
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glPointSize( 20.0 );
-    glutTimerFunc(10,time,1);
+    glutTimerFunc(20,time,1);
     glutDisplayFunc(dibuja);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(tecla);
