@@ -66,12 +66,18 @@ void dotExplode(){
 void shoot(){
     glColor3f( 1.0f, 1.0f, 1.0f );
     
-    if(direction == 1 && xb > 0){
-        glBegin(GL_LINE);
-        glVertex2f( xb, yb);
-        glVertex2f( xb-2, yb);
-        xb-=2;
-        glEnd();
+    if(direction == 1){
+        if (xb > 0-screenWidth/2) {
+            glBegin(GL_LINES);
+            glVertex2f( xb, yb);
+            glVertex2f( xb-5, yb);
+            xb-=screenWidth*.02;
+            glEnd();
+        }
+        else {
+            bullet = 0;
+            direction = 0;
+        }
     }
     
     glFlush();
@@ -178,13 +184,6 @@ void dibuja() {
     if (bullet) {
         shoot();
     }
-    
-
-    glBegin(GL_LINE);
-    glVertex2f( -200, 0);
-    glVertex2f( 200, 0);
-    glEnd();
-    glFlush();
     glutSwapBuffers();
 }
 
