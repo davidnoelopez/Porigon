@@ -1,15 +1,10 @@
 //
-//  main.cpp
-//  CuboSinNada
-//  Created by Ma. Guadalupe Roque on 24/09/13.
-//  Copyright (c) 2013 Ma. Guadalupe Roque. All rights reserved.
-//
+//  David Lopez A01138388
+//  Patricio Gonzalez A01190487
 //
 //  main.cpp
-//  TransformacionesCuboGC13
+//  Porigon
 //
-//  Created by Maria  Roque on 21/02/13.
-//  Copyright (c) 2013 Tecnológico de Monterrey. All rights reserved.
 //
 
 #include <GLUT/glut.h>
@@ -27,7 +22,7 @@ int explode=0;
 int bullet=0;
 float xY, yY, xZ,yZ, x, y, xd, yd, xa, xb, yb, ya, xe, ye, es=20, trans=0.55;
 int x1=0, x2=0,y1=0,y2=0;
-int	screenWidth = 400, screenHeight = 400;
+int	screenWidth = 800, screenHeight = 800;
 Bala arregloBalas[10];
 Bala bul;
 
@@ -78,7 +73,7 @@ void shoot(){
                     glBegin(GL_LINES);
                     glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
                     glVertex2f( arregloBalas[index].x+10, arregloBalas[index].y);
-                    arregloBalas[index].x-=screenWidth*.02;
+                    arregloBalas[index].x-=screenWidth*.01;
                     glEnd();
                     
                 }
@@ -93,7 +88,7 @@ void shoot(){
                     glBegin(GL_LINES);
                     glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
                     glVertex2f( arregloBalas[index].x, arregloBalas[index].y-10);
-                    arregloBalas[index].y+=screenHeight*.02;
+                    arregloBalas[index].y+=screenHeight*.01;
                     glEnd();
                     
                 }
@@ -108,7 +103,7 @@ void shoot(){
                     glBegin(GL_LINES);
                     glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
                     glVertex2f( arregloBalas[index].x-10, arregloBalas[index].y);
-                    arregloBalas[index].x+=screenWidth*.02;
+                    arregloBalas[index].x+=screenWidth*.01;
                     glEnd();
                     
                 }
@@ -123,7 +118,7 @@ void shoot(){
                     glBegin(GL_LINES);
                     glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
                     glVertex2f( arregloBalas[index].x, arregloBalas[index].y+10);
-                    arregloBalas[index].y-=screenHeight*.02;
+                    arregloBalas[index].y-=screenHeight*.01;
                     glEnd();
                     
                 }
@@ -246,7 +241,7 @@ int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(400, 400);
+	glutInitWindowSize(screenWidth, screenHeight);
 	glutCreateWindow("Porigon");
     // Para que OpenGl reconozca la profundidad en el eje Z
 	glEnable(GL_DEPTH_TEST);
