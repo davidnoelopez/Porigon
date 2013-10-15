@@ -25,7 +25,6 @@ int anguloY=0;
 int anguloZ=0;
 int explode=0;
 int bullet=0;
-int direction=0;
 float xY, yY, xZ,yZ, x, y, xd, yd, xa, xb, yb, ya, xe, ye, es=20, trans=0.55;
 int x1=0, x2=0,y1=0,y2=0;
 int	screenWidth = 400, screenHeight = 400;
@@ -75,15 +74,60 @@ void shoot(){
     for (int index = 0; index < sizeof(arregloBalas); index++) {
         switch (arregloBalas[index].direccion) {
             case 1:
-                if (arregloBalas[index].x > 0-screenWidth/2) {
+                if (arregloBalas[index].x > -screenWidth/2) {
                     glBegin(GL_LINES);
                     glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
-                    glVertex2f( arregloBalas[index].x-10, arregloBalas[index].y);
+                    glVertex2f( arregloBalas[index].x+10, arregloBalas[index].y);
                     arregloBalas[index].x-=screenWidth*.02;
                     glEnd();
                     
                 }
-                else {
+                else if (arregloBalas[index].viva) {
+                    arregloBalas[index].viva = 0;
+                    bullet--;
+                }
+                break;
+                
+            case 2:
+                if (arregloBalas[index].y < screenHeight/2) {
+                    glBegin(GL_LINES);
+                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y-10);
+                    arregloBalas[index].y+=screenHeight*.02;
+                    glEnd();
+                    
+                }
+                else if (arregloBalas[index].viva) {
+                    arregloBalas[index].viva = 0;
+                    bullet--;
+                }
+                break;
+                
+            case 3:
+                if (arregloBalas[index].x < screenWidth/2) {
+                    glBegin(GL_LINES);
+                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                    glVertex2f( arregloBalas[index].x-10, arregloBalas[index].y);
+                    arregloBalas[index].x+=screenWidth*.02;
+                    glEnd();
+                    
+                }
+                else if (arregloBalas[index].viva) {
+                    arregloBalas[index].viva = 0;
+                    bullet--;
+                }
+                break;
+                
+            case 4:
+                if (arregloBalas[index].y > -screenHeight/2) {
+                    glBegin(GL_LINES);
+                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y+10);
+                    arregloBalas[index].y-=screenHeight*.02;
+                    glEnd();
+                    
+                }
+                else if (arregloBalas[index].viva) {
                     arregloBalas[index].viva = 0;
                     bullet--;
                 }
@@ -95,6 +139,22 @@ void shoot(){
     }
     
     glFlush();
+}
+
+void crearBala (int dir) {
+    if (bullet < 10) {
+        bullet++;
+        int auxbullet = bullet;
+        int continuaWhile = 1;
+        while (continuaWhile) {
+            if (&arregloBalas[auxbullet] == NULL || arregloBalas[auxbullet].viva == 0) {
+                arregloBalas[auxbullet] = Bala(xa, ya, dir);
+                continuaWhile = 0;
+            }
+            else
+                auxbullet++;
+        }
+    }
 }
 
 void reshape (int a, int h)
@@ -125,6 +185,7 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
 {
     x = mouseX;
     y = screenHeight - mouseY;
+    
     switch (key)
     {
         case ' ':
@@ -135,26 +196,13 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
             }
             break;
         case 'a':
-            if (bullet < 10) {
-                bullet++;
-                int auxbullet = bullet;
-                int continuaWhile = 1;
-                while (continuaWhile) {
-                    if (&arregloBalas[auxbullet] == NULL || arregloBalas[auxbullet].viva == 0) {
-                        arregloBalas[auxbullet] = Bala(xa, ya, 1);
-                        continuaWhile = 0;
-                    }
-                    else
-                        auxbullet++;   
-                }
-            }
-            break;
+            crearBala(1); break;
         case 'w':
-            direction=2; break;
+            crearBala(2); break;
         case 'd':
-            direction=3; break;
+            crearBala(3); break;
         case 's':
-            direction=4; break;
+            crearBala(4); break;
     }
 }
 
@@ -188,7 +236,7 @@ void dibuja() {
     if(explode){
         dotExplode();
     }
-    if (bullet) {
+    if (bullet > 0) {
         shoot();
     }
     glutSwapBuffers();
