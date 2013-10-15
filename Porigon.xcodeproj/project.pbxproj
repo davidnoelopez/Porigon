@@ -11,6 +11,7 @@
 		5551AD18180304FA00B07964 /* Porigon.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5551AD17180304FA00B07964 /* Porigon.1 */; };
 		5551AD201803050400B07964 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5551AD1E1803050400B07964 /* GLUT.framework */; };
 		5551AD211803050400B07964 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5551AD1F1803050400B07964 /* OpenGL.framework */; };
+		55E02274180D0B2B006B50FF /* Bala.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55E02272180D0B2B006B50FF /* Bala.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,6 +33,8 @@
 		5551AD17180304FA00B07964 /* Porigon.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Porigon.1; sourceTree = "<group>"; };
 		5551AD1E1803050400B07964 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		5551AD1F1803050400B07964 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		55E02272180D0B2B006B50FF /* Bala.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Bala.cpp; sourceTree = "<group>"; };
+		55E02273180D0B2B006B50FF /* Bala.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bala.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +73,8 @@
 			children = (
 				5551AD15180304FA00B07964 /* main.cpp */,
 				5551AD17180304FA00B07964 /* Porigon.1 */,
+				55E02272180D0B2B006B50FF /* Bala.cpp */,
+				55E02273180D0B2B006B50FF /* Bala.h */,
 			);
 			path = Porigon;
 			sourceTree = "<group>";
@@ -126,6 +131,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5551AD16180304FA00B07964 /* main.cpp in Sources */,
+				55E02274180D0B2B006B50FF /* Bala.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,6 +230,7 @@
 				5551AD1D180304FA00B07964 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

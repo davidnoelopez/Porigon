@@ -14,6 +14,9 @@
 
 #include <GLUT/glut.h>
 #include <iostream>
+#include <vector>
+#include "Bala.h"
+
 using namespace std;
 const float medida = 25;  // Mitad del tamaño de cada lado del cubo
 int angulo=0;
@@ -26,6 +29,8 @@ int direction=0;
 float xY, yY, xZ,yZ, x, y, xd, yd, xa, xb, yb, ya, xe, ye, es=20, trans=0.55;
 int x1=0, x2=0,y1=0,y2=0;
 int	screenWidth = 400, screenHeight = 400;
+Bala arregloBalas[10];
+Bala bul;
 
 
 
@@ -53,7 +58,7 @@ void dotExplode(){
     es+=0.5;                //calcula tamaño
     glColor4f( 1.0f, 1.0f, 1.0f, trans);
     glBegin(GL_POINTS);
-    glVertex2d(xe, ye);
+    glVertex3f(xe, ye, -1);
 	glEnd();
     
     if(trans<=0){
@@ -66,17 +71,26 @@ void dotExplode(){
 void shoot(){
     glColor3f( 1.0f, 1.0f, 1.0f );
     
-    if(direction == 1){
-        if (xb > 0-screenWidth/2) {
-            glBegin(GL_LINES);
-            glVertex2f( xb, yb);
-            glVertex2f( xb-5, yb);
-            xb-=screenWidth*.02;
-            glEnd();
-        }
-        else {
-            bullet = 0;
-            direction = 0;
+        
+    for (int index = 0; index < sizeof(arregloBalas); index++) {
+        switch (arregloBalas[index].direccion) {
+            case 1:
+                if (arregloBalas[index].x > 0-screenWidth/2) {
+                    glBegin(GL_LINES);
+                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                    glVertex2f( arregloBalas[index].x-10, arregloBalas[index].y);
+                    arregloBalas[index].x-=screenWidth*.02;
+                    glEnd();
+                    
+                }
+                else {
+                    arregloBalas[index].viva = 0;
+                    bullet--;
+                }
+                break;
+                
+            default:
+                break;
         }
     }
     
@@ -103,16 +117,8 @@ void myMouse(int button, int state, int mouseX, int mouseY)
     x = mouseX;
     y = screenHeight - mouseY;
         if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && explode == 0){
-            explode=1;
-            xe=xa;
-            ye=ya;
+            
         }
-    //    else if (button == GLUT_RIGHT_BUTTON){
-    //        anguloZ+=10;
-    //        x2=x;
-    //        y2=y;
-    //        dibuja();
-    //    }
 }
 
 void myKeyboard(unsigned char key, int mouseX, int mouseY)
@@ -129,13 +135,18 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
             }
             break;
         case 'a':
-            if (bullet == 0) {
-                direction=1;
-                bullet=1;
-                xb=xa;
-                yb=ya;
-                xe=xa;
-                ye=ya;
+            if (bullet < 10) {
+                bullet++;
+                int auxbullet = bullet;
+                int continuaWhile = 1;
+                while (continuaWhile) {
+                    if (&arregloBalas[auxbullet] == NULL || arregloBalas[auxbullet].viva == 0) {
+                        arregloBalas[auxbullet] = Bala(xa, ya, 1);
+                        continuaWhile = 0;
+                    }
+                    else
+                        auxbullet++;   
+                }
             }
             break;
         case 'w':
@@ -173,13 +184,9 @@ void time(int v)
 void dibuja() {
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glPushMatrix();
     dibujaDot();
-    //glPopMatrix();
     if(explode){
-        //glPushMatrix();
         dotExplode();
-        //glPopMatrix();
     }
     if (bullet) {
         shoot();
