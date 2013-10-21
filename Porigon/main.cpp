@@ -12,6 +12,7 @@
 #include <vector>
 #include "Bala.h"
 #include <math.h>
+#define _USE_MATH_DEFINES
 
 using namespace std;
 const float medida = 25;  // Mitad del tamaño de cada lado del cubo
@@ -24,6 +25,7 @@ int bullet=0;
 float xY, yY, xZ,yZ, x, y, xd, yd, xa, xb, yb, ya, xe, ye, es=20, trans=0.55;
 int x1=0, x2=0;
 int	screenWidth = 800, screenHeight = 800;
+float carga = M_PI*2;
 Bala arregloBalas[10];
 Bala bul;
 
@@ -52,22 +54,22 @@ void dibujaArco(float cx, float cy, float r, float start_angle, float arc_angle,
     float radial_factor = cosf(theta);
     
     
-    float x = r * cosf(start_angle);//we now start at the start angle
-    float y = r * sinf(start_angle);
-    
+    float xr = r * cosf(start_angle);//we now start at the start angle
+    float yr = r * sinf(start_angle);
+    glColor4f( 0.5f, 0.5f, 0.5f, 1.0f );
     glBegin(GL_LINE_STRIP);//since the arc is not a closed curve, this is a strip now
     for(int ii = 0; ii < num_segments; ii++)
     {
-        glVertex2f(x + cx, y + cy);
+        glVertex2f(xr + cx, yr + cy);
         
-        float tx = -y;
-        float ty = x;
+        float tx = -yr;
+        float ty = xr;
         
-        x += tx * tangetial_factor;
-        y += ty * tangetial_factor; 
+        xr += tx * tangetial_factor;
+        yr += ty * tangetial_factor;
         
-        x *= radial_factor; 
-        y *= radial_factor; 
+        xr *= radial_factor;
+        yr *= radial_factor;
     } 
     glEnd(); 
 }
@@ -80,12 +82,15 @@ void dotExplode(){
         trans-=0.03;        //calcula transparencia
     }
     es+=0.5;                //calcula tamaño
+    carga+=.01265822785*M_PI*2;
+    
     glColor4f( 1.0f, 1.0f, 1.0f, trans);
     glBegin(GL_POINTS);
     glVertex3f(xe, ye, -1);
 	glEnd();
     
     if(trans<=0){
+        cout << es;
         explode=0;
         es=20;
         trans=0.55;
@@ -218,6 +223,7 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
                 explode=1;
                 xe=xa;
                 ye=ya;
+                carga = 0;
             }
             break;
         case 'a':
@@ -257,9 +263,9 @@ void time(int v)
 void dibuja() {
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLineWidth(5);
+    glLineWidth(2);
     dibujaDot();
-    dibujaArco(xa, ya, 20, 1.7, 6, 1000);
+    dibujaArco(xa, ya, 13, M_PI/2, carga, 100);
     if(explode){
         dotExplode();
     }
