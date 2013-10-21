@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include "Bala.h"
+#include <math.h>
 
 using namespace std;
 const float medida = 25;  // Mitad del tamaño de cada lado del cubo
@@ -21,11 +22,10 @@ int anguloZ=0;
 int explode=0;
 int bullet=0;
 float xY, yY, xZ,yZ, x, y, xd, yd, xa, xb, yb, ya, xe, ye, es=20, trans=0.55;
-int x1=0, x2=0,y1=0,y2=0;
+int x1=0, x2=0;
 int	screenWidth = 800, screenHeight = 800;
 Bala arregloBalas[10];
 Bala bul;
-
 
 
 void dibujaDot(){
@@ -40,6 +40,36 @@ void dibujaDot(){
     glVertex3f(xa, ya, 0);
 	glEnd();
     
+}
+
+//Se crea arco
+void dibujaArco(float cx, float cy, float r, float start_angle, float arc_angle, int num_segments)
+{
+    float theta = arc_angle / float(num_segments - 1);//theta is now calculated from the arc angle instead, the - 1 bit comes from the fact that the arc is open
+    
+    float tangetial_factor = tanf(theta);
+    
+    float radial_factor = cosf(theta);
+    
+    
+    float x = r * cosf(start_angle);//we now start at the start angle
+    float y = r * sinf(start_angle);
+    
+    glBegin(GL_LINE_STRIP);//since the arc is not a closed curve, this is a strip now
+    for(int ii = 0; ii < num_segments; ii++)
+    {
+        glVertex2f(x + cx, y + cy);
+        
+        float tx = -y;
+        float ty = x;
+        
+        x += tx * tangetial_factor;
+        y += ty * tangetial_factor; 
+        
+        x *= radial_factor; 
+        y *= radial_factor; 
+    } 
+    glEnd(); 
 }
 
 //Se crea explocion
@@ -227,7 +257,9 @@ void time(int v)
 void dibuja() {
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLineWidth(5);
     dibujaDot();
+    dibujaArco(xa, ya, 20, 1.7, 6, 1000);
     if(explode){
         dotExplode();
     }
