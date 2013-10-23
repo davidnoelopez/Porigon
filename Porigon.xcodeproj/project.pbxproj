@@ -11,6 +11,7 @@
 		5551AD18180304FA00B07964 /* Porigon.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5551AD17180304FA00B07964 /* Porigon.1 */; };
 		5551AD201803050400B07964 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5551AD1E1803050400B07964 /* GLUT.framework */; };
 		5551AD211803050400B07964 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5551AD1F1803050400B07964 /* OpenGL.framework */; };
+		555EB882181759BB0004DDA8 /* Enemigo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 555EB880181759BB0004DDA8 /* Enemigo.cpp */; };
 		55E02274180D0B2B006B50FF /* Bala.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55E02272180D0B2B006B50FF /* Bala.cpp */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +34,8 @@
 		5551AD17180304FA00B07964 /* Porigon.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Porigon.1; sourceTree = "<group>"; };
 		5551AD1E1803050400B07964 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		5551AD1F1803050400B07964 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		555EB880181759BB0004DDA8 /* Enemigo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Enemigo.cpp; sourceTree = "<group>"; };
+		555EB881181759BB0004DDA8 /* Enemigo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Enemigo.h; sourceTree = "<group>"; };
 		55E02272180D0B2B006B50FF /* Bala.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Bala.cpp; sourceTree = "<group>"; };
 		55E02273180D0B2B006B50FF /* Bala.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bala.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -75,6 +78,8 @@
 				5551AD17180304FA00B07964 /* Porigon.1 */,
 				55E02272180D0B2B006B50FF /* Bala.cpp */,
 				55E02273180D0B2B006B50FF /* Bala.h */,
+				555EB880181759BB0004DDA8 /* Enemigo.cpp */,
+				555EB881181759BB0004DDA8 /* Enemigo.h */,
 			);
 			path = Porigon;
 			sourceTree = "<group>";
@@ -132,6 +137,7 @@
 			files = (
 				5551AD16180304FA00B07964 /* main.cpp in Sources */,
 				55E02274180D0B2B006B50FF /* Bala.cpp in Sources */,
+				555EB882181759BB0004DDA8 /* Enemigo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
