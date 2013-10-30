@@ -322,14 +322,30 @@ void dibujarEnemigos()
         
         if (((vectorEnemigos.at(n)->x + vectorEnemigos.at(n)->size/2) < xa-10 || (vectorEnemigos.at(n)->x - vectorEnemigos.at(n)->size/2) > xa+10) ||
             ((vectorEnemigos.at(n)->y + vectorEnemigos.at(n)->size/2) < ya-10 || (vectorEnemigos.at(n)->y - vectorEnemigos.at(n)->size/2) > ya+10)) {
-            if (xa > vectorEnemigos.at(n)->x)
-                vectorEnemigos.at(n)->x += vectorEnemigos.at(n)->velocidad;
-            else if (xa < vectorEnemigos.at(n)->x)
-                vectorEnemigos.at(n)->x -= vectorEnemigos.at(n)->velocidad;
-            if (ya > vectorEnemigos.at(n)->y)
-                vectorEnemigos.at(n)->y += vectorEnemigos.at(n)->velocidad;
-            else if (ya < vectorEnemigos.at(n)->y)
-                vectorEnemigos.at(n)->y -= vectorEnemigos.at(n)->velocidad;
+            if (xa > vectorEnemigos.at(n)->x){
+                if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
+                    vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200));
+                else
+                    vectorEnemigos.at(n)->x +=vectorEnemigos.at(n)->velocidad;
+            }
+            else if (xa < vectorEnemigos.at(n)->x){
+                if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
+                    vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200));
+                else
+                    vectorEnemigos.at(n)->x -=vectorEnemigos.at(n)->velocidad;
+            }
+            if (ya > vectorEnemigos.at(n)->y){
+                if(((ya-vectorEnemigos.at(n)->y)/200)>vectorEnemigos.at(n)->velocidad)
+                    vectorEnemigos.at(n)->y += (vectorEnemigos.at(n)->velocidad*((ya-vectorEnemigos.at(n)->y)/200));
+                else
+                    vectorEnemigos.at(n)->y +=vectorEnemigos.at(n)->velocidad;
+            }
+            else if (ya < vectorEnemigos.at(n)->y){
+                if(((ya-vectorEnemigos.at(n)->y)/200)>vectorEnemigos.at(n)->velocidad)
+                    vectorEnemigos.at(n)->y += (vectorEnemigos.at(n)->velocidad*((ya-vectorEnemigos.at(n)->y)/200));
+                else
+                    vectorEnemigos.at(n)->y -=vectorEnemigos.at(n)->velocidad;
+            }
         }
         else {
             vectorEnemigos.erase(vectorEnemigos.begin()+n);
