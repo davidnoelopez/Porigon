@@ -72,7 +72,7 @@ void pintarMarcador()
     stringstream puntaje;
     puntaje << puntos;
     
-    escribirTexto("Score: " + puntaje.str(), -0.95, 0.9, GLUT_BITMAP_HELVETICA_18);
+    escribirTexto("Score: " + puntaje.str(), -screenWidth/2+screenWidth/25, screenHeight/2-screenHeight/25, GLUT_BITMAP_HELVETICA_18);
     
     /*if (0) {
         texto = "GAME OVER.";
