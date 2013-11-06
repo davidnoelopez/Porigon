@@ -10,9 +10,15 @@
 #include <GLUT/glut.h>
 #include <iostream>
 #include <vector>
+#include <math.h>
+#include <iostream>
+#include <string>
+#include <sstream>
+
+//clases custom
 #include "Bala.h"
 #include "Enemigo.h"
-#include <math.h>
+
 #define _USE_MATH_DEFINES
 
 using namespace std;
@@ -32,6 +38,7 @@ int hit = 0;
 Bala arregloBalas[10];
 Bala bul;
 vector<Enemigo *> vectorEnemigos;
+int puntos = 0;
 
 void dibujaDot(){
     if (hit) {
@@ -50,6 +57,28 @@ void dibujaDot(){
     glVertex3f(xa, ya, 0);
 	glEnd();
     
+}
+
+void escribirTexto(std::string texto, double x, double y, void * font)
+{
+    glRasterPos2f(x, y);
+    for (std::string::iterator i = texto.begin(); i != texto.end(); ++i)
+        glutBitmapCharacter(font, *i);
+}
+
+void pintarMarcador()
+{
+    glColor3f(1.0, 1.0, 1.0);
+    stringstream puntaje;
+    puntaje << puntos;
+    
+    escribirTexto("Score: " + puntaje.str(), -0.95, 0.9, GLUT_BITMAP_HELVETICA_18);
+    
+    /*if (0) {
+        texto = "GAME OVER.";
+    }*/
+    
+    glFlush();
 }
 
 //Se crea arco
@@ -317,7 +346,7 @@ void dibujarEnemigos()
 {
     int tam = 0;
     tam = (int)vectorEnemigos.size();
-    for (int n = 0; n < tam; n++) {
+    for (int n = 0; n < tam; n++){
         if (vectorEnemigos.at(n)) {
             glColor3f(1, 1, 1);
             vectorEnemigos.at(n)->dibuja();
@@ -352,13 +381,21 @@ void dibujarEnemigos()
                         vectorEnemigos.at(n)->y -=vectorEnemigos.at(n)->velocidad;
                 }
             }
-            //Enemigo coliciona con DOT
+            //Enemigo coliciona con DOT o con bala
             else {
-                vectorEnemigos.erase(vectorEnemigos.begin()+n);
-                tam--;
-                n--;
+                
                 if (!colicionBalas) {
                     hit = 5;
+                    puntos -= 100;
+                    vectorEnemigos.erase(vectorEnemigos.begin()+n);
+                    tam--;
+                    n--;
+                }
+                else {
+                    puntos += vectorEnemigos.at(n)->tipo*5;
+                    vectorEnemigos.erase(vectorEnemigos.begin()+n);
+                    tam--;
+                    n--;
                 }
                 
             }
@@ -386,8 +423,8 @@ void display()
     if (bullet > 0) {
         moverBalas();
     }
-    
     dibujarEnemigos();
+    pintarMarcador();
     glutSwapBuffers();
 }
 
