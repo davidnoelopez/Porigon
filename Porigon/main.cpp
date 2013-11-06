@@ -106,77 +106,73 @@ void dotExplode(){
 
 void moverBalas(){
     
-    
-        
     for (int index = 0; index < sizeof(arregloBalas); index++) {
         if (arregloBalas[index].viva) {
             glColor3f( 1.0f, 1.0f, 1.0f );
-        }
-        else
-            glColor3f( 0.0f, 0.0f, 0.0f );
-        switch (arregloBalas[index].direccion) {
-            case 1:
-                if (arregloBalas[index].x > -screenWidth/2) {
-                    glBegin(GL_LINES);
-                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
-                    glVertex2f( arregloBalas[index].x+10, arregloBalas[index].y);
-                    arregloBalas[index].x-=screenWidth*.01;
-                    glEnd();
+            switch (arregloBalas[index].direccion) {
+                case 1:
+                    if (arregloBalas[index].x > -screenWidth/2) {
+                        glBegin(GL_LINES);
+                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                        glVertex2f( arregloBalas[index].x+10, arregloBalas[index].y);
+                        arregloBalas[index].x-=screenWidth*.01;
+                        glEnd();
+                        
+                    }
+                    else if (arregloBalas[index].viva) {
+                        arregloBalas[index].viva = 0;
+                        bullet--;
+                    }
+                    break;
                     
-                }
-                else if (arregloBalas[index].viva) {
-                    arregloBalas[index].viva = 0;
-                    bullet--;
-                }
-                break;
-                
-            case 2:
-                if (arregloBalas[index].y < screenHeight/2) {
-                    glBegin(GL_LINES);
-                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
-                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y-10);
-                    arregloBalas[index].y+=screenHeight*.01;
-                    glEnd();
+                case 2:
+                    if (arregloBalas[index].y < screenHeight/2) {
+                        glBegin(GL_LINES);
+                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y-10);
+                        arregloBalas[index].y+=screenHeight*.01;
+                        glEnd();
+                        
+                    }
+                    else if (arregloBalas[index].viva) {
+                        arregloBalas[index].viva = 0;
+                        bullet--;
+                    }
+                    break;
                     
-                }
-                else if (arregloBalas[index].viva) {
-                    arregloBalas[index].viva = 0;
-                    bullet--;
-                }
-                break;
-                
-            case 3:
-                if (arregloBalas[index].x < screenWidth/2) {
-                    glBegin(GL_LINES);
-                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
-                    glVertex2f( arregloBalas[index].x-10, arregloBalas[index].y);
-                    arregloBalas[index].x+=screenWidth*.01;
-                    glEnd();
+                case 3:
+                    if (arregloBalas[index].x < screenWidth/2) {
+                        glBegin(GL_LINES);
+                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                        glVertex2f( arregloBalas[index].x-10, arregloBalas[index].y);
+                        arregloBalas[index].x+=screenWidth*.01;
+                        glEnd();
+                        
+                    }
+                    else if (arregloBalas[index].viva) {
+                        arregloBalas[index].viva = 0;
+                        bullet--;
+                    }
+                    break;
                     
-                }
-                else if (arregloBalas[index].viva) {
-                    arregloBalas[index].viva = 0;
-                    bullet--;
-                }
-                break;
-                
-            case 4:
-                if (arregloBalas[index].y > -screenHeight/2) {
-                    glBegin(GL_LINES);
-                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
-                    glVertex2f( arregloBalas[index].x, arregloBalas[index].y+10);
-                    arregloBalas[index].y-=screenHeight*.01;
-                    glEnd();
+                case 4:
+                    if (arregloBalas[index].y > -screenHeight/2) {
+                        glBegin(GL_LINES);
+                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y+10);
+                        arregloBalas[index].y-=screenHeight*.01;
+                        glEnd();
+                        
+                    }
+                    else if (arregloBalas[index].viva) {
+                        arregloBalas[index].viva = 0;
+                        bullet--;
+                    }
+                    break;
                     
-                }
-                else if (arregloBalas[index].viva) {
-                    arregloBalas[index].viva = 0;
-                    bullet--;
-                }
-                break;
-                
-            default:
-                break;
+                default:
+                    break;
+            }
         }
     }
     
@@ -189,9 +185,10 @@ void crearBala (int dir)
         bullet++;
         int auxbullet = bullet;
         int continuaWhile = 1;
+        Bala auxBala = Bala(xa, ya, dir);
         while (continuaWhile) {
             if (&arregloBalas[auxbullet] == NULL || arregloBalas[auxbullet].viva == 0) {
-                arregloBalas[auxbullet] = Bala(xa, ya, dir);
+                arregloBalas[auxbullet] = auxBala;
                 continuaWhile = 0;
             }
             else
@@ -239,12 +236,16 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
                 carga = 0;
             }
             break;
+        case 'A':
         case 'a':
             crearBala(1); break;
+        case 'W':
         case 'w':
             crearBala(2); break;
+        case 'D':
         case 'd':
             crearBala(3); break;
+        case 'S':
         case 's':
             crearBala(4); break;
     }
@@ -277,7 +278,7 @@ void crearEnemigos(int v)
         }
         //lado arriba
         else if (auxenemigo->lado == 2) {
-            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight/2)-screenHeight, 1);
+            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight/2)-screenHeight, 2);
         }
         //lado der
         else if (auxenemigo->lado == 3) {
@@ -285,7 +286,7 @@ void crearEnemigos(int v)
         }
         //lado abajo
         else if (auxenemigo->lado == 4) {
-            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight)+screenHeight/2, 1);
+            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight)+screenHeight/2, 2);
         }
         vectorEnemigos.push_back(auxenemigo);
     }
@@ -294,62 +295,73 @@ void crearEnemigos(int v)
     glutTimerFunc(500, crearEnemigos, 1);
 }
 
-void revisarColisionBalas(int vec)
+int revisarColisionBalas(int vec)
 {
-    for (int count = 0; count < sizeof(arregloBalas); count++) {
-        if (!(((vectorEnemigos.at(vec)->x + vectorEnemigos.at(vec)->size/2) < arregloBalas[count].x || (vectorEnemigos.at(vec)->x - vectorEnemigos.at(vec)->size/2) > arregloBalas[count].x) ||
-            ((vectorEnemigos.at(vec)->y + vectorEnemigos.at(vec)->size/2) < arregloBalas[count].y || (vectorEnemigos.at(vec)->y - vectorEnemigos.at(vec)->size/2) > arregloBalas[count].y)) && arregloBalas[count].viva) {
-            bullet--;
-            arregloBalas[count].viva = 0;
-            if (vectorEnemigos.at(vec)->vida == 1) {
-                vectorEnemigos.erase(vectorEnemigos.begin()+vec);
+    if (bullet)
+        for (int count = 0; count < sizeof(arregloBalas); count++) {
+            if (arregloBalas[count].viva) {
+                if ((arregloBalas[count].x < (vectorEnemigos.at(vec)->x + vectorEnemigos.at(vec)->size/2)) && (arregloBalas[count].x > (vectorEnemigos.at(vec)->x - vectorEnemigos.at(vec)->size/2)) &&
+                    (arregloBalas[count].y < (vectorEnemigos.at(vec)->y + vectorEnemigos.at(vec)->size/2)) && (arregloBalas[count].y > (vectorEnemigos.at(vec)->y - vectorEnemigos.at(vec)->size/2))) {
+                    cout << arregloBalas[count].x << " - " << arregloBalas[count].y;
+                    bullet--;
+                    arregloBalas[count].viva = 0;
+                    vectorEnemigos.at(vec)->vida--;
+                    return 1;
+                }
             }
-            else{
-                vectorEnemigos.at(vec)->vida--;
-            }
-            
         }
-    }
+    return 0;
 }
 
 void dibujarEnemigos()
 {
-    for (int n = 0; n < vectorEnemigos.size(); n++) {
-        glColor3f(1, 1, 1);
-        vectorEnemigos.at(n)->dibuja();
-        
-        revisarColisionBalas(n);
-        
-        if (((vectorEnemigos.at(n)->x + vectorEnemigos.at(n)->size/2) < xa-10 || (vectorEnemigos.at(n)->x - vectorEnemigos.at(n)->size/2) > xa+10) ||
-            ((vectorEnemigos.at(n)->y + vectorEnemigos.at(n)->size/2) < ya-10 || (vectorEnemigos.at(n)->y - vectorEnemigos.at(n)->size/2) > ya+10)) {
-            if (xa > vectorEnemigos.at(n)->x){
-                if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
-                    vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200));
-                else
-                    vectorEnemigos.at(n)->x +=vectorEnemigos.at(n)->velocidad;
+    int tam = 0;
+    tam = (int)vectorEnemigos.size();
+    for (int n = 0; n < tam; n++) {
+        if (vectorEnemigos.at(n)) {
+            glColor3f(1, 1, 1);
+            vectorEnemigos.at(n)->dibuja();
+            
+            int colicionBalas = revisarColisionBalas(n);
+            
+            if ((((vectorEnemigos.at(n)->x + vectorEnemigos.at(n)->size/2) < xa-10 || (vectorEnemigos.at(n)->x - vectorEnemigos.at(n)->size/2) > xa+10) ||
+                ((vectorEnemigos.at(n)->y + vectorEnemigos.at(n)->size/2) < ya-10 || (vectorEnemigos.at(n)->y - vectorEnemigos.at(n)->size/2) > ya+10)) &&
+                vectorEnemigos.at(n)->vida > 0) {
+                if (xa > vectorEnemigos.at(n)->x){
+                    if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
+                        vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200));
+                    else
+                        vectorEnemigos.at(n)->x +=vectorEnemigos.at(n)->velocidad;
+                }
+                else if (xa < vectorEnemigos.at(n)->x){
+                    if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
+                        vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200));
+                    else
+                        vectorEnemigos.at(n)->x -=vectorEnemigos.at(n)->velocidad;
+                }
+                if (ya > vectorEnemigos.at(n)->y){
+                    if(((ya-vectorEnemigos.at(n)->y)/200)>vectorEnemigos.at(n)->velocidad)
+                        vectorEnemigos.at(n)->y += (vectorEnemigos.at(n)->velocidad*((ya-vectorEnemigos.at(n)->y)/200));
+                    else
+                        vectorEnemigos.at(n)->y +=vectorEnemigos.at(n)->velocidad;
+                }
+                else if (ya < vectorEnemigos.at(n)->y){
+                    if(((ya-vectorEnemigos.at(n)->y)/200)>vectorEnemigos.at(n)->velocidad)
+                        vectorEnemigos.at(n)->y += (vectorEnemigos.at(n)->velocidad*((ya-vectorEnemigos.at(n)->y)/200));
+                    else
+                        vectorEnemigos.at(n)->y -=vectorEnemigos.at(n)->velocidad;
+                }
             }
-            else if (xa < vectorEnemigos.at(n)->x){
-                if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
-                    vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200));
-                else
-                    vectorEnemigos.at(n)->x -=vectorEnemigos.at(n)->velocidad;
+            //Enemigo coliciona con DOT
+            else {
+                vectorEnemigos.erase(vectorEnemigos.begin()+n);
+                tam--;
+                n--;
+                if (!colicionBalas) {
+                    hit = 5;
+                }
+                
             }
-            if (ya > vectorEnemigos.at(n)->y){
-                if(((ya-vectorEnemigos.at(n)->y)/200)>vectorEnemigos.at(n)->velocidad)
-                    vectorEnemigos.at(n)->y += (vectorEnemigos.at(n)->velocidad*((ya-vectorEnemigos.at(n)->y)/200));
-                else
-                    vectorEnemigos.at(n)->y +=vectorEnemigos.at(n)->velocidad;
-            }
-            else if (ya < vectorEnemigos.at(n)->y){
-                if(((ya-vectorEnemigos.at(n)->y)/200)>vectorEnemigos.at(n)->velocidad)
-                    vectorEnemigos.at(n)->y += (vectorEnemigos.at(n)->velocidad*((ya-vectorEnemigos.at(n)->y)/200));
-                else
-                    vectorEnemigos.at(n)->y -=vectorEnemigos.at(n)->velocidad;
-            }
-        }
-        else {
-            vectorEnemigos.erase(vectorEnemigos.begin()+n);
-            hit = 5;
         }
     }
 }
@@ -361,7 +373,7 @@ void time(int v)
     glutTimerFunc(20,time,1);
 }
 
-void dibuja()
+void display()
 {
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -374,8 +386,16 @@ void dibuja()
     if (bullet > 0) {
         moverBalas();
     }
+    
     dibujarEnemigos();
     glutSwapBuffers();
+}
+
+void init(){
+    Bala auxBala =  Bala();
+    for (int count = 0; count < sizeof(arregloBalas); count++) {
+        arregloBalas[count] = auxBala;
+    }
 }
 
 int main(int argc, char** argv)
@@ -389,10 +409,11 @@ int main(int argc, char** argv)
     glEnable( GL_POINT_SMOOTH );
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    //init();
     glPointSize( 20.0 );
     glutTimerFunc(20,time,1);
     glutTimerFunc(500, crearEnemigos, 1);
-    glutDisplayFunc(dibuja);
+    glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(tecla);
     glutMouseFunc(myMouse);

@@ -16,7 +16,7 @@ class Bala
 public:
     float x, y;
     int direccion;
-    int viva = 1;
+    int viva;
     Bala ();
     Bala ( float posx, float posy, int dir ); //constructor
 };

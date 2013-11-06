@@ -28,4 +28,5 @@ Bala::Bala ( float posx, float posy, int dir )
     x = posx;
     y = posy;
     direccion = dir;
+    viva = 1;
 }
