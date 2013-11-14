@@ -18,6 +18,7 @@
 //clases custom
 #include "Bala.h"
 #include "Enemigo.h"
+#include "imageloader.h"
 
 #define _USE_MATH_DEFINES
 
@@ -38,7 +39,21 @@ int hit = 0;
 Bala arregloBalas[10];
 Bala bul;
 vector<Enemigo *> vectorEnemigos;
-int puntos = 0;
+int puntos = 0, dificultad = 1;
+
+//  Initialize light source and shading model (GL_FLAT).
+
+float mat_specular [] = {0.0,0.0,0.0,1.0};
+float mat_emission [] = {0.0,0.0,0.0,1.0};
+float mat_ambient_diffuse [] = {0.5,0.5,0.5,1.0};
+float mat_shininess = 0.4*128;
+float spot_dir [] = {0.0,0.0,-1.0};
+float spot_cutoff = 30.0;
+float spot_exponent = 1.0;
+float light_ambient [] = {1.0,1.0,1.0,1.0};
+float light_diffuse_specular [] = {0.5,0.5,0.5,1.0};
+float light_pos [] = {0.0,0.0,3.0, 1.0};
+
 
 void dibujaDot(){
     if (hit) {
@@ -47,14 +62,20 @@ void dibujaDot(){
     }
     else
         glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-    glPointSize( 20.0 );
+    //glPointSize( 20.0 );
+    
     
     if(xd!=0 && yd!=0){
         xa=xa+(xd-xa)/10;
         ya=ya+(yd-ya)/10;
     }
-    glBegin(GL_POINTS);
-    glVertex3f(xa, ya, 0);
+    glPushMatrix ();
+    glTranslatef(xa, ya, 0);
+    glutSolidSphere(10, 50, 50);
+    glPopMatrix ();
+    
+    //glBegin(GL_POINTS);
+    //glVertex3f(xa, ya, 0);
 	glEnd();
     
 }
@@ -216,12 +237,14 @@ void crearBala (int dir)
         int continuaWhile = 1;
         Bala auxBala = Bala(xa, ya, dir);
         while (continuaWhile) {
-            if (&arregloBalas[auxbullet] == NULL || arregloBalas[auxbullet].viva == 0) {
+            if (arregloBalas[auxbullet].viva == 0) {
                 arregloBalas[auxbullet] = auxBala;
                 continuaWhile = 0;
             }
-            else
+            else if (auxbullet < sizeof(arregloBalas)-1)
                 auxbullet++;
+            else
+                auxbullet = 0;
         }
     }
 }
@@ -304,20 +327,24 @@ void crearEnemigos(int v)
         //lado izq
         if (auxenemigo->lado == 1) {
             auxenemigo = new Enemigo((rand()%screenWidth/2)-screenWidth, (rand()%screenHeight)-screenHeight/2, 1);
+            vectorEnemigos.push_back(auxenemigo);
         }
         //lado arriba
         else if (auxenemigo->lado == 2) {
             auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight/2)-screenHeight, 2);
+            vectorEnemigos.push_back(auxenemigo);
         }
         //lado der
         else if (auxenemigo->lado == 3) {
             auxenemigo = new Enemigo((rand()%screenWidth)+screenWidth/2, (rand()%screenHeight)-screenHeight/2, 1);
+            vectorEnemigos.push_back(auxenemigo);
         }
         //lado abajo
         else if (auxenemigo->lado == 4) {
             auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight)+screenHeight/2, 2);
+            vectorEnemigos.push_back(auxenemigo);
         }
-        vectorEnemigos.push_back(auxenemigo);
+        
     }
     
     glutPostRedisplay();
@@ -331,7 +358,7 @@ int revisarColisionBalas(int vec)
             if (arregloBalas[count].viva) {
                 if ((arregloBalas[count].x < (vectorEnemigos.at(vec)->x + vectorEnemigos.at(vec)->size/2)) && (arregloBalas[count].x > (vectorEnemigos.at(vec)->x - vectorEnemigos.at(vec)->size/2)) &&
                     (arregloBalas[count].y < (vectorEnemigos.at(vec)->y + vectorEnemigos.at(vec)->size/2)) && (arregloBalas[count].y > (vectorEnemigos.at(vec)->y - vectorEnemigos.at(vec)->size/2))) {
-                    cout << arregloBalas[count].x << " - " << arregloBalas[count].y;
+                    
                     bullet--;
                     arregloBalas[count].viva = 0;
                     vectorEnemigos.at(vec)->vida--;
@@ -345,17 +372,22 @@ int revisarColisionBalas(int vec)
 void dibujarEnemigos()
 {
     int tam = 0;
-    tam = (int)vectorEnemigos.size();
+    if (!vectorEnemigos.empty())
+        tam = (int)vectorEnemigos.size();
+    
     for (int n = 0; n < tam; n++){
-        if (vectorEnemigos.at(n)) {
+        if (&vectorEnemigos.at(n)->lado != nullptr) {
             glColor3f(1, 1, 1);
+            
             vectorEnemigos.at(n)->dibuja();
             
             int colicionBalas = revisarColisionBalas(n);
             
+            //cambia posicion de enemigo y revisa que no choque con el DOT
             if ((((vectorEnemigos.at(n)->x + vectorEnemigos.at(n)->size/2) < xa-10 || (vectorEnemigos.at(n)->x - vectorEnemigos.at(n)->size/2) > xa+10) ||
                 ((vectorEnemigos.at(n)->y + vectorEnemigos.at(n)->size/2) < ya-10 || (vectorEnemigos.at(n)->y - vectorEnemigos.at(n)->size/2) > ya+10)) &&
                 vectorEnemigos.at(n)->vida > 0) {
+                
                 if (xa > vectorEnemigos.at(n)->x){
                     if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
                         vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200));
@@ -392,6 +424,7 @@ void dibujarEnemigos()
                     n--;
                 }
                 else {
+                    
                     puntos += vectorEnemigos.at(n)->tipo*5;
                     vectorEnemigos.erase(vectorEnemigos.begin()+n);
                     tam--;
@@ -410,6 +443,23 @@ void time(int v)
     glutTimerFunc(20,time,1);
 }
 
+void mostrarLuz()
+{
+    /*light_pos[0] = xa;
+    light_pos[1] = ya;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();
+    glLightfv(GL_LIGHT0,GL_POSITION,light_pos);
+    glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spot_dir);
+    glTranslatef(light_pos[0],light_pos[1],light_pos[2]);
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glEnable(GL_COLOR_MATERIAL);
+    glColor4fv(mat_emission);
+    glDisable(GL_COLOR_MATERIAL);
+    glPopMatrix();
+     */
+}
+
 void display()
 {
     glutSetCursor(GLUT_CURSOR_NONE);
@@ -425,14 +475,25 @@ void display()
     }
     dibujarEnemigos();
     pintarMarcador();
+    mostrarLuz();
     glutSwapBuffers();
 }
 
 void init(){
-    Bala auxBala =  Bala();
-    for (int count = 0; count < sizeof(arregloBalas); count++) {
-        arregloBalas[count] = auxBala;
-    }
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.0,0.0,0.0,0.0);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_FALSE);
+    glEnable(GL_LIGHTING);
+    glLightfv(GL_LIGHT0,GL_AMBIENT,light_ambient);
+    glLightfv(GL_LIGHT0,GL_DIFFUSE,light_diffuse_specular);
+    glLightfv(GL_LIGHT0,GL_SPECULAR,light_diffuse_specular);
+    glLightf(GL_LIGHT0,GL_SPOT_CUTOFF,spot_cutoff);
+    glLightf(GL_LIGHT0,GL_SPOT_EXPONENT,spot_exponent);
+    glEnable(GL_LIGHT0);
+    glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, mat_ambient_diffuse);
+    glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
+    glMaterialf(GL_FRONT,GL_SHININESS,mat_shininess);
 }
 
 int main(int argc, char** argv)
@@ -446,12 +507,13 @@ int main(int argc, char** argv)
     glEnable( GL_POINT_SMOOTH );
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    //init();
+    init();
     glPointSize( 20.0 );
     glutTimerFunc(20,time,1);
     glutTimerFunc(500, crearEnemigos, 1);
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
+    glutIgnoreKeyRepeat(1);
     glutKeyboardFunc(tecla);
     glutMouseFunc(myMouse);
     glutKeyboardFunc(myKeyboard);
