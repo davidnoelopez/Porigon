@@ -55,29 +55,41 @@ void Enemigo::dibuja(){
     if (&tipo != NULL) {
         switch (tipo) {
             case 1:
-                glBegin(GL_POLYGON);
-                glVertex2d(x-size/2, y-size/2);
-                glVertex2d(x+size/2, y-size/2);
-                glVertex2d(x, y+size/2);
-                glEnd();
-                break;
-            case 2:
             {
-                Image* image = loadBMP("/Users/Dave/Dropbox/Tareas Cloud/7º Semestre/Graficas/Porigon/Porigon/Textura1.bmp");
+                Image* image = loadBMP("/Users/Pato/Documents/TEC/7mo Semestre/Gráficas Computacionales/Dot/Git/Porigon/Porigon/Textura1.bmp");
                 loadTexture(image, 0);
                 
                 glBindTexture(GL_TEXTURE_2D, texturas[0]);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            
+                glBegin(GL_POLYGON);
+                glTexCoord2f(0.0f, 0.0f);
+                glVertex2d(x-size/2, y-size/2);
+                glTexCoord2f(1.0f, 0.0f);
+                glVertex2d(x+size/2, y-size/2);
+                glTexCoord2f(0.5f, 1.0f);
+                glVertex2d(x, y+size/2);
+                glEnd();
+                break;
+            }
+            case 2:
+            {
+                Image* image = loadBMP("/Users/Pato/Documents/TEC/7mo Semestre/Gráficas Computacionales/Dot/Git/Porigon/Porigon/Textura1.bmp");
+                loadTexture(image, 0);
+                
+                glBindTexture(GL_TEXTURE_2D, texturas[0]);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                 glBegin(GL_QUADS);
                 glNormal3f( 0.0f, 0.0f, 1.0f);
                 glTexCoord2f(0.0f, 0.0f);
                 glVertex3f(x-size/2, y-size/2,  1.0f);
-                glTexCoord2f(2.0f, 0.0f);
+                glTexCoord2f(1.0f, 0.0f);
                 glVertex3f(x+size/2, y-size/2,  1.0f);
-                glTexCoord2f(2.0f, 2.0f);
+                glTexCoord2f(1.0f, 1.0f);
                 glVertex3f(x+size/2, y+size/2,  1.0f);
-                glTexCoord2f(0.0f, 2.0f);
+                glTexCoord2f(0.0f, 1.0f);
                 glVertex3f(x-size/2, y+size/2,  1.0f);
                 glEnd();
 

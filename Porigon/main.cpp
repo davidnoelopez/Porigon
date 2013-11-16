@@ -48,10 +48,10 @@ float mat_emission [] = {0.0,0.0,0.0,1.0};
 float mat_ambient_diffuse [] = {0.5,0.5,0.5,1.0};
 float mat_shininess = 0.4*128;
 float spot_dir [] = {0.0,0.0,-1.0};
-float spot_cutoff = 30.0;
-float spot_exponent = 1.0;
+float spot_cutoff = 170.0;
+float spot_exponent = 0.0;
 float light_ambient [] = {1.0,1.0,1.0,1.0};
-float light_diffuse_specular [] = {0.5,0.5,0.5,1.0};
+float light_diffuse_specular [] = {0.8,0.8,0.8,1.0};
 float light_pos [] = {0.0,0.0,3.0, 1.0};
 
 
@@ -423,7 +423,7 @@ void dibujarEnemigos()
                     tam--;
                     n--;
                 }
-                else {
+                else if(vectorEnemigos.at(n)->vida == 0){
                     
                     puntos += vectorEnemigos.at(n)->tipo*5;
                     vectorEnemigos.erase(vectorEnemigos.begin()+n);
@@ -480,7 +480,7 @@ void display()
 }
 
 void init(){
-    glShadeModel(GL_SMOOTH);
+    glShadeModel(GL_FLAT);
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0,0.0,0.0,0.0);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_FALSE);
@@ -490,10 +490,16 @@ void init(){
     glLightfv(GL_LIGHT0,GL_SPECULAR,light_diffuse_specular);
     glLightf(GL_LIGHT0,GL_SPOT_CUTOFF,spot_cutoff);
     glLightf(GL_LIGHT0,GL_SPOT_EXPONENT,spot_exponent);
+    glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,1.0);
+    //light_pos [0] = xa;
+    //light_pos [1] = ya;
+    glLightfv( GL_LIGHT0, GL_POSITION, light_pos );
     glEnable(GL_LIGHT0);
     glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, mat_ambient_diffuse);
     glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
     glMaterialf(GL_FRONT,GL_SHININESS,mat_shininess);
+    glEnable(GL_TEXTURE_2D);
+
 }
 
 int main(int argc, char** argv)
