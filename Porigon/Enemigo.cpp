@@ -30,19 +30,33 @@ Enemigo::Enemigo ( float posx, float posy, int t)
     tipo = t;
     switch (tipo) {
         case 1:
+        {
             size = 20;
             vida = 1;
             velocidad = rand()%1+1;
             break;
+        }
         case 2:
+        {
             size = 20;
             vida = 2;
             velocidad = rand()%2+1;
             break;
+        }
         case 3:
+        {
             size = 20;
             vida = 4;
             velocidad = rand()%2+2;
+            break;
+        }
+        case 10:
+        {
+            size = 100;
+            vida = 10;
+            velocidad = 1;
+            break;
+        }
         default:
             break;
     }
@@ -64,12 +78,13 @@ void loadTexture(Image* image, int k){
 
 void Enemigo::dibuja(float xa, float ya){
     if (&tipo != NULL) {
-        string path = "/Users/Dave/Dropbox/Tareas Cloud/7º Semestre/Graficas/Porigon/Porigon/";
+        string path = "";
         string textura;
         switch (tipo) {
                 //dibuja triangulo
             case 1:
             {
+                float focus_emission [] = {0.0,0.0,1.0,1.0};
                 textura = path + "Textura1.bmp";
                 Image* image = loadBMP(textura.c_str());
                 loadTexture(image, 0);
@@ -81,6 +96,10 @@ void Enemigo::dibuja(float xa, float ya){
                 glPushMatrix();
                 glTranslatef(x, y, 0);
                 glRotated(angulo-90, 0, 0, 1);
+                //pone color
+                glColorMaterial(GL_FRONT,GL_EMISSION);
+                glEnable(GL_COLOR_MATERIAL);
+                glColor4fv(focus_emission);
                 glBegin(GL_POLYGON);
                 glTexCoord2f(0.0f, 0.0f);
                 glVertex2d(-size/2, -size/2);
@@ -95,6 +114,7 @@ void Enemigo::dibuja(float xa, float ya){
                 //dibuja cuadro
             case 2:
             {
+                float focus_emission [] = {0.0,1.0,0.0,1.0};
                 textura = path + "Textura1.bmp";
                 Image* image = loadBMP(textura.c_str());
                 loadTexture(image, 0);
@@ -107,6 +127,10 @@ void Enemigo::dibuja(float xa, float ya){
                 glPushMatrix();
                 glTranslatef(x, y, 0);
                 glRotated(angulo-90, 0, 0, 1);
+                //pone color
+                glColorMaterial(GL_FRONT,GL_EMISSION);
+                glEnable(GL_COLOR_MATERIAL);
+                glColor4fv(focus_emission);
                 glBegin(GL_QUADS);
                 glNormal3f( 0.0f, 0.0f, 1.0f);
                 glTexCoord2f(0.0f, 0.0f);
@@ -125,6 +149,7 @@ void Enemigo::dibuja(float xa, float ya){
                 //dibuja pentagono
             case 3:
             {
+                float focus_emission [] = {0.0,1.0,1.0,1.0};
                 textura = path + "Textura1.bmp";
                 Image* image = loadBMP(textura.c_str());
                 loadTexture(image, 0);
@@ -137,6 +162,10 @@ void Enemigo::dibuja(float xa, float ya){
                 glPushMatrix();
                 glTranslatef(x, y, 0);
                 glRotated(angulo-90, 0, 0, 1);
+                //pone color
+                glColorMaterial(GL_FRONT,GL_EMISSION);
+                glEnable(GL_COLOR_MATERIAL);
+                glColor4fv(focus_emission);
                 glBegin(GL_POLYGON);
                 glTexCoord2f(0.0f, 0.5f);
                 glVertex3f(-size/2, 0,  1.0f);
@@ -151,6 +180,23 @@ void Enemigo::dibuja(float xa, float ya){
                 glEnd();
                 glPopMatrix();
                 
+                break;
+            }
+                //dibuja cubo grande
+            case 10:
+            {
+                float focus_emission [] = {1.0,0.0,1.0,1.0};
+                double angulo = atan2((ya - y), (xa - x)) * 180 / M_PI;
+                
+                glPushMatrix();
+                glTranslatef(x, y, 0);
+                glRotated(angulo, x, y, 1);
+                //pone color
+                glColorMaterial(GL_FRONT,GL_EMISSION);
+                glEnable(GL_COLOR_MATERIAL);
+                glColor4fv(focus_emission);
+                glutSolidCube(size);
+                glPopMatrix();
                 break;
             }
             default:
