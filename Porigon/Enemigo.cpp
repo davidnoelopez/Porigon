@@ -27,15 +27,23 @@ Enemigo::Enemigo ( float posx, float posy, int t)
     x = posx;
     y = posy;
     tipo = t;
-    if (t == 1) {
-        size = 20;
-        vida = 1;
-        velocidad = rand()%1+1;
-    }
-    else if (t == 2) {
-        size = 20;
-        vida = 2;
-        velocidad = rand()%1+1;
+    switch (tipo) {
+        case 1:
+            size = 20;
+            vida = 1;
+            velocidad = rand()%1+1;
+            break;
+        case 2:
+            size = 20;
+            vida = 2;
+            velocidad = rand()%2+1;
+            break;
+        case 3:
+            size = 20;
+            vida = 4;
+            velocidad = rand()%2+2;
+        default:
+            break;
     }
 }
 
@@ -58,6 +66,7 @@ void Enemigo::dibuja(){
         string path = "/Users/Dave/Dropbox/Tareas Cloud/7º Semestre/Graficas/Porigon/Porigon/";
         string textura;
         switch (tipo) {
+                //dibuja triangulo
             case 1:
             {
                 textura = path + "Textura1.bmp";
@@ -67,17 +76,22 @@ void Enemigo::dibuja(){
                 glBindTexture(GL_TEXTURE_2D, texturas[0]);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            
+                
+                glPushMatrix();
+                glTranslatef(x, y, 0);
+                glRotated(90, 0, 0, 1);
                 glBegin(GL_POLYGON);
                 glTexCoord2f(0.0f, 0.0f);
-                glVertex2d(x-size/2, y-size/2);
+                glVertex2d(-size/2, -size/2);
                 glTexCoord2f(1.0f, 0.0f);
-                glVertex2d(x+size/2, y-size/2);
+                glVertex2d(size/2, -size/2);
                 glTexCoord2f(0.5f, 1.0f);
-                glVertex2d(x, y+size/2);
+                glVertex2d(0, size/2);
                 glEnd();
+                glPopMatrix();
                 break;
             }
+                //dibuja cuadro
             case 2:
             {
                 textura = path + "Textura1.bmp";
@@ -98,13 +112,32 @@ void Enemigo::dibuja(){
                 glTexCoord2f(0.0f, 1.0f);
                 glVertex3f(x-size/2, y+size/2,  1.0f);
                 glEnd();
-
-                /*glBegin(GL_POLYGON);
-                glVertex2d(x-size/2, y-size/2);
-                glVertex2d(x+size/2, y-size/2);
-                glVertex2d(x+size/2, y+size/2);
-                glVertex2d(x-size/2, y+size/2);
-                glEnd();*/
+                
+                break;
+            }
+                //dibuja pentagono
+            case 3:
+            {
+                textura = path + "Textura1.bmp";
+                Image* image = loadBMP(textura.c_str());
+                loadTexture(image, 0);
+                
+                glBindTexture(GL_TEXTURE_2D, texturas[0]);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glBegin(GL_POLYGON);
+                glTexCoord2f(0.0f, 0.5f);
+                glVertex3f(x-size/2, y,  1.0f);
+                glTexCoord2f(0.25f, 0.0f);
+                glVertex3f(x-size/4, y-size/2,  1.0f);
+                glTexCoord2f(0.75f, 0.0f);
+                glVertex3f(x+(size/4), y-size/2,  1.0f);
+                glTexCoord2f(1.0f, 0.5f);
+                glVertex3f(x+size/2, y,  1.0f);
+                glTexCoord2f(0.5f, 1.0f);
+                glVertex3f(x, y+size/2,  1.0f);
+                glEnd();
+                
                 break;
             }
             default:

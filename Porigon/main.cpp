@@ -331,7 +331,7 @@ void crearEnemigos(int v)
         }
         //lado arriba
         else if (auxenemigo->lado == 2) {
-            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight/2)-screenHeight, 2);
+            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight/2)-screenHeight, 3);
             vectorEnemigos.push_back(auxenemigo);
         }
         //lado der
@@ -389,25 +389,25 @@ void dibujarEnemigos()
                 ((vectorEnemigos.at(n)->y + vectorEnemigos.at(n)->size/2) < ya-10 || (vectorEnemigos.at(n)->y - vectorEnemigos.at(n)->size/2) > ya+10)) &&
                 vectorEnemigos.at(n)->vida > 0) {
                 
-                if (xa > vectorEnemigos.at(n)->x){
+                if (xa-7 > vectorEnemigos.at(n)->x){
                     if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
                         vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200));
                     else
                         vectorEnemigos.at(n)->x +=vectorEnemigos.at(n)->velocidad;
                 }
-                else if (xa < vectorEnemigos.at(n)->x){
+                else if (xa+7 < vectorEnemigos.at(n)->x){
                     if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
                         vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200));
                     else
                         vectorEnemigos.at(n)->x -=vectorEnemigos.at(n)->velocidad;
                 }
-                if (ya > vectorEnemigos.at(n)->y){
+                if (ya-7 > vectorEnemigos.at(n)->y){
                     if(((ya-vectorEnemigos.at(n)->y)/200)>vectorEnemigos.at(n)->velocidad)
                         vectorEnemigos.at(n)->y += (vectorEnemigos.at(n)->velocidad*((ya-vectorEnemigos.at(n)->y)/200));
                     else
                         vectorEnemigos.at(n)->y +=vectorEnemigos.at(n)->velocidad;
                 }
-                else if (ya < vectorEnemigos.at(n)->y){
+                else if (ya+7 < vectorEnemigos.at(n)->y){
                     if(((ya-vectorEnemigos.at(n)->y)/200)>vectorEnemigos.at(n)->velocidad)
                         vectorEnemigos.at(n)->y += (vectorEnemigos.at(n)->velocidad*((ya-vectorEnemigos.at(n)->y)/200));
                     else
@@ -435,6 +435,26 @@ void dibujarEnemigos()
             }
         }
     }
+}
+
+//Grid inferior
+void crearGrid(){
+    glColor4f(0.247, 0.071, 0.259, 1.0);
+    glLineWidth(1);
+    glLoadIdentity();
+    glLineStipple(10, 0xAAAA);
+    glEnable(GL_LINE_STIPPLE);
+    glBegin(GL_LINES);
+    for (float i = -screenWidth/2; i < screenWidth/2; i += screenWidth/25) {
+        glVertex3f(i, -screenHeight/2, -1);
+        glVertex3f(i, screenHeight/2, -1);
+    }
+    for (float i = -screenHeight/2; i < screenHeight/2; i += screenHeight/25) {
+        glVertex3f(-screenWidth/2, i, -1);
+        glVertex3f(screenWidth/2, i, -1);
+    }
+    glEnd();
+    glDisable(GL_LINE_STIPPLE);
 }
 
 void time(int v)
@@ -465,6 +485,7 @@ void display()
 {
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    crearGrid();
     glLineWidth(2);
     dibujaDot();
     dibujaArco(xa, ya, 13, M_PI/2, carga, 100);
