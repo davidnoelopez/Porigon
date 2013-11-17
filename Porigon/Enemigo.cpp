@@ -11,6 +11,7 @@
 #include "Imageloader.h"
 #include <stdlib.h>
 #include <string>
+#include <math.h>
 
 using namespace std;
 
@@ -61,7 +62,7 @@ void loadTexture(Image* image, int k){
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
 }
 
-void Enemigo::dibuja(){
+void Enemigo::dibuja(float xa, float ya){
     if (&tipo != NULL) {
         string path = "/Users/Dave/Dropbox/Tareas Cloud/7º Semestre/Graficas/Porigon/Porigon/";
         string textura;
@@ -76,10 +77,10 @@ void Enemigo::dibuja(){
                 glBindTexture(GL_TEXTURE_2D, texturas[0]);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                
+                double angulo = atan2((ya - y), (xa - x)) * 180 / M_PI;
                 glPushMatrix();
                 glTranslatef(x, y, 0);
-                glRotated(90, 0, 0, 1);
+                glRotated(angulo-90, 0, 0, 1);
                 glBegin(GL_POLYGON);
                 glTexCoord2f(0.0f, 0.0f);
                 glVertex2d(-size/2, -size/2);
@@ -101,17 +102,23 @@ void Enemigo::dibuja(){
                 glBindTexture(GL_TEXTURE_2D, texturas[0]);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                
+                double angulo = atan2((ya - y), (xa - x)) * 180 / M_PI;
+                glPushMatrix();
+                glTranslatef(x, y, 0);
+                glRotated(angulo-90, 0, 0, 1);
                 glBegin(GL_QUADS);
                 glNormal3f( 0.0f, 0.0f, 1.0f);
                 glTexCoord2f(0.0f, 0.0f);
-                glVertex3f(x-size/2, y-size/2,  1.0f);
+                glVertex3f(-size/2, -size/2,  1.0f);
                 glTexCoord2f(1.0f, 0.0f);
-                glVertex3f(x+size/2, y-size/2,  1.0f);
+                glVertex3f(size/2, -size/2,  1.0f);
                 glTexCoord2f(1.0f, 1.0f);
-                glVertex3f(x+size/2, y+size/2,  1.0f);
+                glVertex3f(size/2, size/2,  1.0f);
                 glTexCoord2f(0.0f, 1.0f);
-                glVertex3f(x-size/2, y+size/2,  1.0f);
+                glVertex3f(-size/2, size/2,  1.0f);
                 glEnd();
+                glPopMatrix();
                 
                 break;
             }
@@ -125,18 +132,24 @@ void Enemigo::dibuja(){
                 glBindTexture(GL_TEXTURE_2D, texturas[0]);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                
+                double angulo = atan2((ya - y), (xa - x)) * 180 / M_PI;
+                glPushMatrix();
+                glTranslatef(x, y, 0);
+                glRotated(angulo-90, 0, 0, 1);
                 glBegin(GL_POLYGON);
                 glTexCoord2f(0.0f, 0.5f);
-                glVertex3f(x-size/2, y,  1.0f);
+                glVertex3f(-size/2, 0,  1.0f);
                 glTexCoord2f(0.25f, 0.0f);
-                glVertex3f(x-size/4, y-size/2,  1.0f);
+                glVertex3f(-size/4, -size/2,  1.0f);
                 glTexCoord2f(0.75f, 0.0f);
-                glVertex3f(x+(size/4), y-size/2,  1.0f);
+                glVertex3f((size/4), -size/2,  1.0f);
                 glTexCoord2f(1.0f, 0.5f);
-                glVertex3f(x+size/2, y,  1.0f);
+                glVertex3f(size/2, 0,  1.0f);
                 glTexCoord2f(0.5f, 1.0f);
-                glVertex3f(x, y+size/2,  1.0f);
+                glVertex3f(0, size/2,  1.0f);
                 glEnd();
+                glPopMatrix();
                 
                 break;
             }

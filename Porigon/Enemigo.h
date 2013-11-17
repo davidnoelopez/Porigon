@@ -22,7 +22,7 @@ public:
     int velocidad;
     Enemigo ();
     Enemigo ( float posx, float posy, int t ); //constructor
-    void dibuja();
+    void dibuja(float xa, float ya);
 };
 
 #endif /* defined(__Porigon__Enemigo__) */

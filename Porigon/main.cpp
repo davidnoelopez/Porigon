@@ -380,7 +380,7 @@ void dibujarEnemigos()
         if (&vectorEnemigos.at(n)->lado != nullptr) {
             glColor3f(1, 1, 1);
             
-            vectorEnemigos.at(n)->dibuja();
+            vectorEnemigos.at(n)->dibuja(xa, ya);
             
             int colicionBalas = revisarColisionBalas(n);
             
