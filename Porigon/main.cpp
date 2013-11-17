@@ -525,22 +525,6 @@ void time(int v)
     glutTimerFunc(20,time,1);
 }
 
-void mostrarLuz()
-{
-    /*light_pos[0] = xa;
-    light_pos[1] = ya;
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPushMatrix();
-    glLightfv(GL_LIGHT0,GL_POSITION,light_pos);
-    glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spot_dir);
-    glTranslatef(light_pos[0],light_pos[1],light_pos[2]);
-    glColorMaterial(GL_FRONT,GL_EMISSION);
-    glEnable(GL_COLOR_MATERIAL);
-    glColor4fv(mat_emission);
-    glDisable(GL_COLOR_MATERIAL);
-    glPopMatrix();
-     */
-}
 
 void display()
 {
@@ -558,13 +542,13 @@ void display()
         moverBalas();
     }
     dibujarEnemigos();
-    mostrarLuz();
     glutSwapBuffers();
 }
 
 void init(){
-    glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
+    glClearColor(0.0,0.0,0.0,0.0);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_FALSE);
     glEnable(GL_LIGHTING);
     glLightfv(GL_LIGHT0,GL_AMBIENT,light_ambient);
@@ -578,7 +562,7 @@ void init(){
     glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, mat_ambient_diffuse);
     glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
     glMaterialf(GL_FRONT,GL_SHININESS,mat_shininess);
-    glEnable(GL_TEXTURE_2D);
+    //glEnable(GL_TEXTURE_2D);
 
 }
 
