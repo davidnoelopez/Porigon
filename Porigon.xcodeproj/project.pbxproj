@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		550223CB18383C1000124E3A /* ImageLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 550223CA18383C1000124E3A /* ImageLoader.cpp */; };
 		5551AD16180304FA00B07964 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5551AD15180304FA00B07964 /* main.cpp */; };
 		5551AD18180304FA00B07964 /* Porigon.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5551AD17180304FA00B07964 /* Porigon.1 */; };
 		5551AD201803050400B07964 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5551AD1E1803050400B07964 /* GLUT.framework */; };
@@ -29,6 +30,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		550223CA18383C1000124E3A /* ImageLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageLoader.cpp; sourceTree = "<group>"; };
 		554D97D3183348F40068C130 /* Textura1.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = Textura1.bmp; sourceTree = "<group>"; };
 		554D97D4183349170068C130 /* Imageloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Imageloader.h; sourceTree = "<group>"; };
 		5551AD12180304FA00B07964 /* Porigon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Porigon; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,6 +78,7 @@
 		5551AD14180304FA00B07964 /* Porigon */ = {
 			isa = PBXGroup;
 			children = (
+				550223CA18383C1000124E3A /* ImageLoader.cpp */,
 				554D97D4183349170068C130 /* Imageloader.h */,
 				554D97D3183348F40068C130 /* Textura1.bmp */,
 				5551AD15180304FA00B07964 /* main.cpp */,
@@ -141,6 +144,7 @@
 			files = (
 				5551AD16180304FA00B07964 /* main.cpp in Sources */,
 				55E02274180D0B2B006B50FF /* Bala.cpp in Sources */,
+				550223CB18383C1000124E3A /* ImageLoader.cpp in Sources */,
 				555EB882181759BB0004DDA8 /* Enemigo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

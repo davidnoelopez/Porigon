@@ -155,76 +155,76 @@ void dotExplode(){
 }
 
 void moverBalas(){
-    
-    for (int index = 0; index < sizeof(arregloBalas); index++) {
-        if (arregloBalas[index].viva) {
-            glColor3f( 1.0f, 1.0f, 1.0f );
-            switch (arregloBalas[index].direccion) {
-                case 1:
-                    if (arregloBalas[index].x > -screenWidth/2) {
-                        glBegin(GL_LINES);
-                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
-                        glVertex2f( arregloBalas[index].x+10, arregloBalas[index].y);
-                        arregloBalas[index].x-=screenWidth*.01;
-                        glEnd();
+    if (bullet > 0)
+        for (int index = 0; index < sizeof(arregloBalas)/sizeof(*arregloBalas); index++) {
+            if (arregloBalas[index].viva) {
+                glColor3f( 1.0f, 1.0f, 1.0f );
+                switch (arregloBalas[index].direccion) {
+                    case 1:
+                        if (arregloBalas[index].x > -screenWidth/2) {
+                            glBegin(GL_LINES);
+                            glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                            glVertex2f( arregloBalas[index].x+10, arregloBalas[index].y);
+                            arregloBalas[index].x-=screenWidth*.01;
+                            glEnd();
+                            
+                        }
+                        else if (arregloBalas[index].viva) {
+                            arregloBalas[index].viva = 0;
+                            bullet--;
+                        }
+                        break;
                         
-                    }
-                    else if (arregloBalas[index].viva) {
-                        arregloBalas[index].viva = 0;
-                        bullet--;
-                    }
-                    break;
-                    
-                case 2:
-                    if (arregloBalas[index].y < screenHeight/2) {
-                        glBegin(GL_LINES);
-                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
-                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y-10);
-                        arregloBalas[index].y+=screenHeight*.01;
-                        glEnd();
+                    case 2:
+                        if (arregloBalas[index].y < screenHeight/2) {
+                            glBegin(GL_LINES);
+                            glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                            glVertex2f( arregloBalas[index].x, arregloBalas[index].y-10);
+                            arregloBalas[index].y+=screenHeight*.01;
+                            glEnd();
+                            
+                        }
+                        else if (arregloBalas[index].viva) {
+                            arregloBalas[index].viva = 0;
+                            bullet--;
+                        }
+                        break;
                         
-                    }
-                    else if (arregloBalas[index].viva) {
-                        arregloBalas[index].viva = 0;
-                        bullet--;
-                    }
-                    break;
-                    
-                case 3:
-                    if (arregloBalas[index].x < screenWidth/2) {
-                        glBegin(GL_LINES);
-                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
-                        glVertex2f( arregloBalas[index].x-10, arregloBalas[index].y);
-                        arregloBalas[index].x+=screenWidth*.01;
-                        glEnd();
+                    case 3:
+                        if (arregloBalas[index].x < screenWidth/2) {
+                            glBegin(GL_LINES);
+                            glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                            glVertex2f( arregloBalas[index].x-10, arregloBalas[index].y);
+                            arregloBalas[index].x+=screenWidth*.01;
+                            glEnd();
+                            
+                        }
+                        else if (arregloBalas[index].viva) {
+                            arregloBalas[index].viva = 0;
+                            bullet--;
+                        }
+                        break;
                         
-                    }
-                    else if (arregloBalas[index].viva) {
-                        arregloBalas[index].viva = 0;
-                        bullet--;
-                    }
-                    break;
-                    
-                case 4:
-                    if (arregloBalas[index].y > -screenHeight/2) {
-                        glBegin(GL_LINES);
-                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
-                        glVertex2f( arregloBalas[index].x, arregloBalas[index].y+10);
-                        arregloBalas[index].y-=screenHeight*.01;
-                        glEnd();
+                    case 4:
+                        if (arregloBalas[index].y > -screenHeight/2) {
+                            glBegin(GL_LINES);
+                            glVertex2f( arregloBalas[index].x, arregloBalas[index].y);
+                            glVertex2f( arregloBalas[index].x, arregloBalas[index].y+10);
+                            arregloBalas[index].y-=screenHeight*.01;
+                            glEnd();
+                            
+                        }
+                        else if (arregloBalas[index].viva) {
+                            arregloBalas[index].viva = 0;
+                            bullet--;
+                        }
+                        break;
                         
-                    }
-                    else if (arregloBalas[index].viva) {
-                        arregloBalas[index].viva = 0;
-                        bullet--;
-                    }
-                    break;
-                    
-                default:
-                    break;
+                    default:
+                        break;
+                }
             }
         }
-    }
     
     glFlush();
 }
@@ -241,7 +241,7 @@ void crearBala (int dir)
                 arregloBalas[auxbullet] = auxBala;
                 continuaWhile = 0;
             }
-            else if (auxbullet < sizeof(arregloBalas)-1)
+            else if (auxbullet < sizeof(arregloBalas)/sizeof(*arregloBalas)-1)
                 auxbullet++;
             else
                 auxbullet = 0;
@@ -353,20 +353,21 @@ void crearEnemigos(int v)
 
 int revisarColisionBalas(int vec)
 {
+    int result = 0;
+    int tamanio = sizeof(arregloBalas)/sizeof(*arregloBalas);
     if (bullet)
-        for (int count = 0; count < sizeof(arregloBalas); count++) {
+        for (int count = 0; count < tamanio; count++) {
             if (arregloBalas[count].viva) {
                 if ((arregloBalas[count].x < (vectorEnemigos.at(vec)->x + vectorEnemigos.at(vec)->size/2)) && (arregloBalas[count].x > (vectorEnemigos.at(vec)->x - vectorEnemigos.at(vec)->size/2)) &&
                     (arregloBalas[count].y < (vectorEnemigos.at(vec)->y + vectorEnemigos.at(vec)->size/2)) && (arregloBalas[count].y > (vectorEnemigos.at(vec)->y - vectorEnemigos.at(vec)->size/2))) {
-                    
                     bullet--;
                     arregloBalas[count].viva = 0;
                     vectorEnemigos.at(vec)->vida--;
-                    return 1;
+                    result = 1;
                 }
             }
         }
-    return 0;
+    return result;
 }
 
 void dibujarEnemigos()
@@ -416,14 +417,14 @@ void dibujarEnemigos()
             //Enemigo coliciona con DOT o con bala
             else {
                 
-                if (!colicionBalas) {
+                if (colicionBalas == 0) {
                     hit = 5;
                     puntos -= 100;
                     vectorEnemigos.erase(vectorEnemigos.begin()+n);
                     tam--;
                     n--;
                 }
-                else if(vectorEnemigos.at(n)->vida == 0){
+                else if(colicionBalas == 1 && vectorEnemigos.at(n)->vida == 0){
                     
                     puntos += vectorEnemigos.at(n)->tipo*5;
                     vectorEnemigos.erase(vectorEnemigos.begin()+n);
