@@ -92,15 +92,17 @@ void dibujaDot(){
 
 void escribirTexto(std::string texto, double x, double y, void * font)
 {
-    float focus_emission [] = {1.0,1.0,1.0,1.0};
+    //se deshabilita luz para poner color
+    glDisable(GL_LIGHTING);
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
     glRasterPos2f(x, y);
+    
     for (std::string::iterator i = texto.begin(); i != texto.end(); ++i){
-        //pone color
-        glColorMaterial(GL_FRONT,GL_EMISSION);
-        glEnable(GL_COLOR_MATERIAL);
-        glColor4fv(focus_emission);
         glutBitmapCharacter(font, *i);
     }
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
 }
 
 void pintarMarcador()
@@ -125,10 +127,10 @@ void pintarMarcador()
         
     stringstream puntaje;
     puntaje << puntos;
-    glPushMatrix();
+    
     
     escribirTexto("Score: " + puntaje.str(), -screenWidth/2+screenWidth/25, screenHeight/2-screenHeight/25, GLUT_BITMAP_HELVETICA_18);
-    glPopMatrix();
+    
     
     /*if (0) {
         texto = "GAME OVER.";
@@ -544,6 +546,7 @@ void display()
 {
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    pintarMarcador();
     crearGrid();
     glLineWidth(2);
     dibujaDot();
@@ -555,7 +558,6 @@ void display()
         moverBalas();
     }
     dibujarEnemigos();
-    pintarMarcador();
     mostrarLuz();
     glutSwapBuffers();
 }
