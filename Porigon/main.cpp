@@ -41,6 +41,7 @@ Bala bul;
 vector<Enemigo *> vectorEnemigos;
 int puntos = 0;
 float dificultad = 1, aumento = 100;
+bool boss = false;
 
 //  Initialize light source and shading model (GL_FLAT).
 
@@ -51,36 +52,33 @@ float mat_shininess = 0.4*128;
 float spot_dir [] = {0.0,0.0,-1.0};
 float spot_cutoff = 170.0;
 float spot_exponent = 0.0;
-float light_ambient [] = {1.0,1.0,1.0,1.0};
+float light_ambient [] = {0.5,0.5,0.5,1.0};
 float light_diffuse_specular [] = {0.8,0.8,0.8,1.0};
 float light_pos [] = {0.0,0.0,3.0, 1.0};
-float colorDOT [] = {0.8,0.8,0.8,1.0};
+float colorDOT [] = {1.0,1.0,1.0,1.0};
 
 
 void dibujaDot(){
+    //cambia el color del DOT si es golpeado
     if (hit) {
         colorDOT[0] = 1.0;
         colorDOT[1] = 0.0;
         colorDOT[2] = 0.0;
-        //glColor4fv(colorDOT);
-        //glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
         hit--;
     }
     else{
         colorDOT[0] = 1.0;
         colorDOT[1] = 1.0;
         colorDOT[2] = 1.0;
-        
     }
-        //glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     
-    //glPointSize( 20.0 );
-    
-    
+    //movimiento fluido
     if(xd!=0 && yd!=0){
         xa=xa+(xd-xa)/10;
         ya=ya+(yd-ya)/10;
     }
+    
+    //dibuja DOT
     glPushMatrix ();
     glTranslatef(xa, ya, 0);
     glColorMaterial(GL_FRONT,GL_EMISSION);
@@ -90,31 +88,47 @@ void dibujaDot(){
     glColor4fv(mat_emission);
     glDisable(GL_COLOR_MATERIAL);
     glPopMatrix ();
-    
-    //glBegin(GL_POINTS);
-    //glVertex3f(xa, ya, 0);
-	glEnd();
-    
 }
 
 void escribirTexto(std::string texto, double x, double y, void * font)
 {
+    float focus_emission [] = {1.0,1.0,1.0,1.0};
     glRasterPos2f(x, y);
-    for (std::string::iterator i = texto.begin(); i != texto.end(); ++i)
+    for (std::string::iterator i = texto.begin(); i != texto.end(); ++i){
+        //pone color
+        glColorMaterial(GL_FRONT,GL_EMISSION);
+        glEnable(GL_COLOR_MATERIAL);
+        glColor4fv(focus_emission);
         glutBitmapCharacter(font, *i);
+    }
 }
 
 void pintarMarcador()
 {
+    //aumenta dificultad dependiendo de puntaje
     if (puntos > aumento) {
         dificultad += .1;
         aumento += aumento/2;
     }
-    glColor3f(1.0, 1.0, 1.0);
+    
+    //agrega cubo gigante boss
+    if (puntos%500 == 0 && puntos > 0) {
+        if (boss) {
+            Enemigo *auxenemigo = new Enemigo((rand()%screenWidth/2)-screenWidth, (rand()%screenHeight)-screenHeight/2, 10);
+            vectorEnemigos.push_back(auxenemigo);
+            boss = false;
+        }
+    }
+    else {
+        boss = true;
+    }
+        
     stringstream puntaje;
     puntaje << puntos;
+    glPushMatrix();
     
     escribirTexto("Score: " + puntaje.str(), -screenWidth/2+screenWidth/25, screenHeight/2-screenHeight/25, GLUT_BITMAP_HELVETICA_18);
+    glPopMatrix();
     
     /*if (0) {
         texto = "GAME OVER.";
@@ -350,26 +364,35 @@ void crearEnemigos(int v)
 {
     int cantidadEnemigos = 10*dificultad;
     if (vectorEnemigos.size() < cantidadEnemigos) {
-        
+        int tipoRandom = rand()%100+1;
+        if (tipoRandom < 50) {
+            tipoRandom = 1;
+        }
+        else if (tipoRandom < 80){
+            tipoRandom = 2;
+        }
+        else if (tipoRandom <= 100){
+            tipoRandom = 3;
+        }
         Enemigo *auxenemigo = new Enemigo();
         //lado izq
         if (auxenemigo->lado == 1) {
-            auxenemigo = new Enemigo((rand()%screenWidth/2)-screenWidth, (rand()%screenHeight)-screenHeight/2, 1);
+            auxenemigo = new Enemigo((rand()%screenWidth/2)-screenWidth, (rand()%screenHeight)-screenHeight/2, tipoRandom);
             vectorEnemigos.push_back(auxenemigo);
         }
         //lado arriba
         else if (auxenemigo->lado == 2) {
-            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight/2)-screenHeight, 3);
+            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight/2)-screenHeight, tipoRandom);
             vectorEnemigos.push_back(auxenemigo);
         }
         //lado der
         else if (auxenemigo->lado == 3) {
-            auxenemigo = new Enemigo((rand()%screenWidth)+screenWidth/2, (rand()%screenHeight)-screenHeight/2, 1);
+            auxenemigo = new Enemigo((rand()%screenWidth)+screenWidth/2, (rand()%screenHeight)-screenHeight/2, tipoRandom);
             vectorEnemigos.push_back(auxenemigo);
         }
         //lado abajo
         else if (auxenemigo->lado == 4) {
-            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight)+screenHeight/2, 2);
+            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight)+screenHeight/2, tipoRandom);
             vectorEnemigos.push_back(auxenemigo);
         }
         
@@ -391,6 +414,7 @@ int revisarColisionBalas(int vec)
                     bullet--;
                     arregloBalas[count].viva = 0;
                     vectorEnemigos.at(vec)->vida--;
+                    vectorEnemigos.at(vec)->hit = 5;
                     result = 1;
                 }
             }
@@ -467,12 +491,27 @@ void dibujarEnemigos()
 
 //Grid inferior
 void crearGrid(){
+    float colorGrid [] = {1.0,1.0,1.0,1.0};
+    if (hit) {
+        colorGrid[0] = 1.0;
+        colorGrid[1] = 0.0;
+        colorGrid[2] = 0.0;
+        hit--;
+    }
+    else{
+        colorGrid[0] = 0.1;
+        colorGrid[1] = 0.1;
+        colorGrid[2] = 0.1;
+    }
     glPushMatrix();
     glTranslatef(0, 0, -screenHeight);
     //rotacion inicial
     glRotated(90, 0, 0, 0);
     //rotacion paralax
     glRotated(1, xa, ya, 0);
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glEnable(GL_COLOR_MATERIAL);
+    glColor4fv(colorGrid);
     glutWireSphere(screenWidth, screenWidth/10, screenHeight/15);
     glPopMatrix();
 }
@@ -524,7 +563,6 @@ void display()
 void init(){
     glShadeModel(GL_FLAT);
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0.0,0.0,0.0,0.0);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_FALSE);
     glEnable(GL_LIGHTING);
     glLightfv(GL_LIGHT0,GL_AMBIENT,light_ambient);
@@ -533,17 +571,12 @@ void init(){
     glLightf(GL_LIGHT0,GL_SPOT_CUTOFF,spot_cutoff);
     glLightf(GL_LIGHT0,GL_SPOT_EXPONENT,spot_exponent);
     glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,1.0);
-    //light_pos [0] = xa;
-    //light_pos [1] = ya;
     glLightfv( GL_LIGHT0, GL_POSITION, light_pos );
     glEnable(GL_LIGHT0);
     glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, mat_ambient_diffuse);
     glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
     glMaterialf(GL_FRONT,GL_SHININESS,mat_shininess);
     glEnable(GL_TEXTURE_2D);
-    
-    Enemigo *auxenemigo = new Enemigo((rand()%screenWidth/2)-screenWidth, (rand()%screenHeight)-screenHeight/2, 10);
-    vectorEnemigos.push_back(auxenemigo);
 
 }
 
@@ -556,6 +589,7 @@ int main(int argc, char** argv)
     // Para que OpenGl reconozca la profundidad en el eje Z
 	glEnable(GL_DEPTH_TEST);
     glEnable( GL_POINT_SMOOTH );
+    glEnable(GL_LINE_SMOOTH);
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     init();

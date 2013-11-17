@@ -20,10 +20,10 @@ public:
     int vida;
     int size;
     int velocidad;
+    int hit = 0;
     Enemigo ();
     Enemigo ( float posx, float posy, int t ); //constructor
     void dibuja(float xa, float ya);
-    void hit();
 };
 
 #endif /* defined(__Porigon__Enemigo__) */

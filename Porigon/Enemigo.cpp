@@ -45,7 +45,7 @@ Enemigo::Enemigo ( float posx, float posy, int t)
         }
         case 3:
         {
-            size = 20;
+            size = 25;
             vida = 4;
             velocidad = rand()%2+2;
             break;
@@ -53,8 +53,8 @@ Enemigo::Enemigo ( float posx, float posy, int t)
         case 10:
         {
             size = 100;
-            vida = 10;
-            velocidad = 1;
+            vida = 50;
+            velocidad = 3;
             break;
         }
         default:
@@ -114,7 +114,19 @@ void Enemigo::dibuja(float xa, float ya){
                 //dibuja cuadro
             case 2:
             {
-                float focus_emission [] = {0.0,1.0,0.0,1.0};
+                float focus_emission[] = {0.0,1.0,0.0,1.0};
+                if (hit) {
+                    focus_emission[0] = 1.0;
+                    focus_emission[1] = 0.0;
+                    focus_emission[2] = 1.0;
+                    hit--;
+                }
+                else {
+                    focus_emission[0] = 0.0;
+                    focus_emission[1] = 1.0;
+                    focus_emission[2] = 0.0;
+                }
+                
                 textura = path + "Textura1.bmp";
                 Image* image = loadBMP(textura.c_str());
                 loadTexture(image, 0);
@@ -150,6 +162,17 @@ void Enemigo::dibuja(float xa, float ya){
             case 3:
             {
                 float focus_emission [] = {0.0,1.0,1.0,1.0};
+                if (hit) {
+                    focus_emission[0] = 1.0;
+                    focus_emission[1] = 0.0;
+                    focus_emission[2] = 0.0;
+                    hit--;
+                }
+                else {
+                    focus_emission[0] = 0.0;
+                    focus_emission[1] = 1.0;
+                    focus_emission[2] = 1.0;
+                }
                 textura = path + "Textura1.bmp";
                 Image* image = loadBMP(textura.c_str());
                 loadTexture(image, 0);
@@ -186,6 +209,17 @@ void Enemigo::dibuja(float xa, float ya){
             case 10:
             {
                 float focus_emission [] = {1.0,0.0,1.0,1.0};
+                if (hit) {
+                    focus_emission[0] = 0.5;
+                    focus_emission[1] = 1.0;
+                    focus_emission[2] = 0.5;
+                    hit--;
+                }
+                else {
+                    focus_emission[0] = 1.0;
+                    focus_emission[1] = 0.0;
+                    focus_emission[2] = 1.0;
+                }
                 double angulo = atan2((ya - y), (xa - x)) * 180 / M_PI;
                 
                 glPushMatrix();
