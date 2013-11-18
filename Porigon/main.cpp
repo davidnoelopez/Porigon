@@ -275,6 +275,9 @@ void moverBalas(){
                     default:
                         break;
                 }
+                glMaterialf(GL_FRONT, GL_SHININESS, 127.0);
+                glColor4fv(mat_emission);
+                glDisable(GL_COLOR_MATERIAL);
                 glPopMatrix();
             }
         }
@@ -332,29 +335,30 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
 {
     x = mouseX;
     y = screenHeight - mouseY;
-    
-    switch (key)
-    {
-        case ' ':
-            if ( explode == 0 ) {
-                explode=1;
-                xe=xa;
-                ye=ya;
-                carga = 0;
-            }
-            break;
-        case 'A':
-        case 'a':
-            crearBala(1); break;
-        case 'W':
-        case 'w':
-            crearBala(2); break;
-        case 'D':
-        case 'd':
-            crearBala(3); break;
-        case 'S':
-        case 's':
-            crearBala(4); break;
+    if (!menu) {
+        switch (key)
+        {
+            case ' ':
+                if ( explode == 0 ) {
+                    explode=1;
+                    xe=xa;
+                    ye=ya;
+                    carga = 0;
+                }
+                break;
+            case 'A':
+            case 'a':
+                crearBala(1); break;
+            case 'W':
+            case 'w':
+                crearBala(2); break;
+            case 'D':
+            case 'd':
+                crearBala(3); break;
+            case 'S':
+            case 's':
+                crearBala(4); break;
+        }
     }
 }
 
@@ -499,13 +503,15 @@ void dibujarEnemigos()
 
 //Grid inferior
 void crearGrid(){
-    float colorGrid [] = {1.0,1.0,1.0,1.0};
-    if (hit) {
+    float colorGrid [] = {1.0,0.0,1.0,1.0};
+    //cambia color del grid cuando es golpeado
+    if (hit > 0) {
         colorGrid[0] = 1.0;
         colorGrid[1] = 0.0;
         colorGrid[2] = 0.0;
         hit--;
     }
+    //color default del grid
     else{
         colorGrid[0] = 0.1;
         colorGrid[1] = 0.1;
@@ -521,6 +527,9 @@ void crearGrid(){
     glEnable(GL_COLOR_MATERIAL);
     glColor4fv(colorGrid);
     glutWireSphere(screenWidth, screenWidth/10, screenHeight/15);
+    
+    glColor4fv(mat_emission);
+    glDisable(GL_COLOR_MATERIAL);
     glPopMatrix();
 }
 
