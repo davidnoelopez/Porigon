@@ -42,6 +42,9 @@ vector<Enemigo *> vectorEnemigos;
 int puntos = 0;
 float dificultad = 1, aumento = 100;
 bool boss = false;
+int vidas = 0;
+bool menu = true;
+GLuint backgroundMenu;
 
 //  Initialize light source and shading model (GL_FLAT).
 
@@ -105,6 +108,18 @@ void escribirTexto(std::string texto, double x, double y, void * font)
     glEnable(GL_LIGHTING);
 }
 
+void pintarVidas() {
+    float vidasY = screenHeight/2-(screenHeight/25)*1.7;
+    float vidasX = -screenWidth/2+screenWidth/25;
+    escribirTexto("Vidas: ", vidasX, vidasY, GLUT_BITMAP_HELVETICA_18);
+    for (int i = 0; i < vidas; i++) {
+        glPushMatrix();
+        glTranslatef(vidasX+60+15*i, vidasY+5, 0);
+        glutSolidSphere(5, 10, 10);
+        glPopMatrix();
+    }
+}
+
 void pintarMarcador()
 {
     //aumenta dificultad dependiendo de puntaje
@@ -130,11 +145,6 @@ void pintarMarcador()
     
     
     escribirTexto("Score: " + puntaje.str(), -screenWidth/2+screenWidth/25, screenHeight/2-screenHeight/25, GLUT_BITMAP_HELVETICA_18);
-    
-    
-    /*if (0) {
-        texto = "GAME OVER.";
-    }*/
     
     glFlush();
 }
@@ -300,7 +310,7 @@ void reshape (int a, int h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     //Sistema de coordenadas en 3D
-    glOrtho(-screenWidth/2, screenWidth/2, -screenHeight/2, screenHeight/2, -screenHeight, screenHeight); //izq, der, abajo, arriba, cerca, lejos
+    glOrtho(-screenWidth/2, screenWidth/2, -screenHeight/2, screenHeight/2, -1500, 1500); //izq, der, abajo, arriba, cerca, lejos
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(0, 0, 20, 0, 0, 0, 0, 1, 0);
@@ -311,8 +321,10 @@ void myMouse(int button, int state, int mouseX, int mouseY)
 {
     x = mouseX;
     y = screenHeight - mouseY;
-        if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && explode == 0){
-            
+    //click en el menu, inicia juego con 3 vidas
+        if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && menu){
+            menu = false;
+            vidas = 3;
         }
 }
 
@@ -354,12 +366,6 @@ void myPasMouse(int mouseX, int mouseY)
     xd=x-screenWidth/2;
     yd=y-screenHeight/2;
     
-}
-
-void tecla (unsigned char t, int x, int y)
-{
-    
-    if (t == 27 || t == 'q' || t=='Q') exit(0);
 }
 
 void crearEnemigos(int v)
@@ -473,7 +479,7 @@ void dibujarEnemigos()
                 
                 if (colicionBalas == 0) {
                     hit = 5;
-                    puntos -= 100;
+                    vidas--;
                     vectorEnemigos.erase(vectorEnemigos.begin()+n);
                     tam--;
                     n--;
@@ -506,7 +512,7 @@ void crearGrid(){
         colorGrid[2] = 0.1;
     }
     glPushMatrix();
-    glTranslatef(0, 0, -screenHeight);
+    glTranslatef(0, 0, -1500-screenWidth/2);
     //rotacion inicial
     glRotated(90, 0, 0, 0);
     //rotacion paralax
@@ -520,28 +526,87 @@ void crearGrid(){
 
 void time(int v)
 {
-    
     glutPostRedisplay();
     glutTimerFunc(20,time,1);
 }
 
+//Makes the image into a texture, and returns the id of the texture
+void loadTexture(Image* image){
+    glBindTexture(GL_TEXTURE_2D, backgroundMenu);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+}
+
+void pintaMenu(){
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glDepthMask(false);
+    
+    //se carga imagen
+    Image* image = loadBMP("startMenu.bmp");
+    loadTexture(image);
+    glBindTexture(GL_TEXTURE_2D, backgroundMenu);
+    
+    //se dibuja imagen con textura
+    glBegin(GL_QUADS);
+    glTexCoord2f( 0, 0 );
+    glVertex2f( -screenWidth/2, -screenHeight/2 );
+    glTexCoord2f( 0, 1 );
+    glVertex2f( -screenWidth/2, screenHeight/2 );
+    glTexCoord2f( 1, 1 );
+    glVertex2f( screenWidth/2, screenHeight/2 );
+    glTexCoord2f( 1, 0);
+    glVertex2f( screenWidth/2, -screenHeight/2 );
+    glEnd();
+    glDepthMask( true );
+    glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+}
 
 void display()
 {
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    pintarMarcador();
-    crearGrid();
-    glLineWidth(2);
-    dibujaDot();
-    dibujaArco(xa, ya, 13, M_PI/2, carga, 100);
-    if(explode){
-        dotExplode();
+    if (menu) {
+        glEnable(GL_TEXTURE_2D);
+        pintaMenu();
+        glDisable(GL_TEXTURE_2D);
     }
-    if (bullet > 0) {
-        moverBalas();
+    else if (vidas <= 0) {
+        //dibuja pantalla de perdiste
+        stringstream puntaje;
+        puntaje << puntos;
+        escribirTexto("GAME OVER", -50, 0, GLUT_BITMAP_TIMES_ROMAN_24);
+        escribirTexto("Your Score: " + puntaje.str(), -50, -25, GLUT_BITMAP_TIMES_ROMAN_24);
     }
-    dibujarEnemigos();
+    //dibuja Juego
+    else if (vidas > 0) {
+        pintarVidas();
+        pintarMarcador();
+        crearGrid();
+        glLineWidth(2);
+        dibujaDot();
+        dibujaArco(xa, ya, 13, M_PI/2, carga, 100);
+        if(explode){
+            dotExplode();
+        }
+        if (bullet > 0) {
+            moverBalas();
+        }
+        dibujarEnemigos();
+    }
     glutSwapBuffers();
 }
 
@@ -585,7 +650,6 @@ int main(int argc, char** argv)
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutIgnoreKeyRepeat(1);
-    glutKeyboardFunc(tecla);
     glutMouseFunc(myMouse);
     glutKeyboardFunc(myKeyboard);
     glutPassiveMotionFunc(myPasMouse);
