@@ -51,7 +51,7 @@ int vidas = 0;
 int menu = 1;
 
 GLuint backgroundMenu;
-static GLuint texturas[6];
+GLuint texturasMain[6];
 
 //  variables para inicializar luces
 
@@ -97,7 +97,7 @@ void pintarVidas() {
     glEnable(GL_COLOR_MATERIAL);
     float vidasY = screenHeight/2-(screenHeight/25)*1.7;
     float vidasX = -screenWidth/2+screenWidth/25;
-    escribirTexto("Vidas: ", vidasX, vidasY, GLUT_BITMAP_HELVETICA_18);
+    escribirTexto("Lives: ", vidasX, vidasY, GLUT_BITMAP_HELVETICA_18);
     for (int i = 0; i < vidas; i++) {
         glPushMatrix();
         glTranslatef(vidasX+60+15*i, vidasY+5, 0);
@@ -398,6 +398,7 @@ void moverBalas(){
 void crearBala (int dir)
 {
     if (bullet < 10) {
+        
         bullet++;
         int auxbullet = bullet;
         int continuaWhile = 1;
@@ -438,8 +439,13 @@ void myMouse(int button, int state, int mouseX, int mouseY)
         if (button == GLUT_LEFT_BUTTON && state == GLUT_UP ){
             switch (menu) {
                 case 1:
-                    menu = 0;
-                    vidas = 3;
+                    if (x > -119+screenWidth/2 && x < 119+screenWidth/2 && y > -66+screenHeight/2 && y < 66+screenHeight/2) {
+                        menu = 0;
+                        vidas = 3;
+                    }
+                    if (x > -184+screenWidth/2 && x < 184+screenWidth/2 && y > -126+screenHeight/2 && y < 126+screenHeight/2) {
+                        cout <<"entra";
+                    }
                     break;
                 case 2:
                     menu = 1;
@@ -480,7 +486,7 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
 
 void myPasMouse(int mouseX, int mouseY)
 {
-    if (menu == 0) {
+    if (menu <= 1) {
         x = mouseX;
         y = screenHeight - mouseY;
         glColor3f( 1.0f, 1.0f, 1.0f );
@@ -678,7 +684,7 @@ void time(int v)
 
 //Makes the image into a texture, and returns the id of the texture
 void loadTextureMain(Image* image, int k){
-    glBindTexture(GL_TEXTURE_2D, texturas[k]);
+    glBindTexture(GL_TEXTURE_2D, texturasMain[k]);
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -721,6 +727,7 @@ void pintaLogo(){
     
     //O
     glPushMatrix();
+    glTranslated(0, 0, -80);
     glColorMaterial(GL_FRONT,GL_EMISSION);
     glColor4fv(colorDOT);
     glutSolidSphere(80, 50, 50);
@@ -751,74 +758,145 @@ void pintaLogo(){
     glPopMatrix();
 }
 
-void pintaMenu(){
-    pintaLogo();
-    glEnable(GL_TEXTURE_2D);
+void botonStart(){
     glEnable(GL_COLOR_MATERIAL);
     
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
-        glColorMaterial(GL_FRONT,GL_EMISSION);
-        glColor4fv(colorDOT);
-        glTranslated(0, -40, 0);
-    //hace hexagono exterior
-        glPushMatrix();
-            glBegin(GL_POLYGON);
-            glVertex2f( -100, 0 );
-            glVertex2f( -80, -20 );
-            glVertex2f( 80, -20 );
-            glVertex2d( 100, 0);
-            glVertex2f( 80, 20 );
-            glVertex2d( -80, 20);
-            glEnd();
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-    //hace el bind de la textura
-        glPushMatrix();
-            glLoadIdentity();
-            glDepthMask(false);
-
-            //se carga imagen
-            Image* image = loadBMP("Images/start.bmp");
-            loadTextureMain(image, 0);
-            glBindTexture(GL_TEXTURE_2D, texturas[0]);
-            //se dibuja imagen con textura
-            glBegin(GL_QUADS);
-            glTexCoord2f( 0, 0 );
-            glVertex2f( -80, -20 );
-            glTexCoord2f( 0, 1 );
-            glVertex2f( -80, 20 );
-            glTexCoord2f( 1, 1 );
-            glVertex2f( 80, 20 );
-            glTexCoord2f( 1, 0);
-            glVertex2f( 80, -20 );
-            glEnd();
-            glColor4fv(mat_emission);
-            
-            glDepthMask( true );
-        glPopMatrix();
-        glMatrixMode(GL_PROJECTION);
-    //hace el hexagono blanco
-        glPushMatrix();
-            glDisable(GL_TEXTURE_2D);
-            glColorMaterial(GL_FRONT,GL_EMISSION);
-            glColor4fv(colorDOT);
-            glBegin(GL_POLYGON);
-            glVertex2f( -103, 0 );
-            glVertex2f( -82, -22 );
-            glVertex2f( 82, -22 );
-            glVertex2d( 103, 0);
-            glVertex2f( 82, 22 );
-            glVertex2d( -82, 22);
-            glEnd();
-    
-        glPopMatrix();
+    glTranslated(0, -40, 0);
+    //hace hexagono negro
+    glPushMatrix();
+    glBegin(GL_POLYGON);
+    glVertex2f( -115, 0 );
+    glVertex2f( -92, -24 );
+    glVertex2f( 92, -24 );
+    glVertex2d( 115, 0);
+    glVertex2f( 92, 24 );
+    glVertex2d( -92, 24);
+    glEnd();
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
+    //hace el bind de la textura
+    glPushMatrix();
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glEnable(GL_TEXTURE_2D);
+    glLoadIdentity();
+    glDepthMask(false);
     
+    //se carga imagen
+    Image* image = loadBMP("Images/start.bmp");
+    loadTextureMain(image, 0);
+    glBindTexture(GL_TEXTURE_2D, texturasMain[0]);
+    //se dibuja imagen con textura
+    glBegin(GL_POLYGON);
+    glTexCoord2f( 0, 0 );
+    glVertex2d( -92, -20 );
+    glTexCoord2f( 1, 0 );
+    glVertex2d( 92, -20 );
+    glTexCoord2f( 1, 1 );
+    glVertex2d( 92, 20 );
+    glTexCoord2f( 0, 1);
+    glVertex2d( -92, 20 );
+    glEnd();
+    glColor4fv(mat_emission);
+    
+    glDepthMask( true );
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    //hace el hexagono blanco
+    glPushMatrix();
     glDisable(GL_TEXTURE_2D);
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glBegin(GL_POLYGON);
+    glVertex2f( -119, 0 );
+    glVertex2f( -94, -26 );
+    glVertex2f( 94, -26 );
+    glVertex2d( 119, 0);
+    glVertex2f( 94, 26 );
+    glVertex2d( -94, 26);
+    glEnd();
     
+    glPopMatrix();
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
     glDisable(GL_COLOR_MATERIAL);
+}
+
+void botonHowto(){
+    glEnable(GL_COLOR_MATERIAL);
+    
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glTranslated(0, -100, 0);
+    //hace hexagono negro
+    glPushMatrix();
+    float colorHex [] = {0,0,0,0};
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorHex);
+    glBegin(GL_POLYGON);
+    glVertex2f( -180, 0 );
+    glVertex2f( -156, -24 );
+    glVertex2f( 156, -24 );
+    glVertex2d( 180, 0);
+    glVertex2f( 156, 24 );
+    glVertex2d( -156, 24);
+    glEnd();
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    //hace el bind de la textura
+    glPushMatrix();
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glEnable(GL_TEXTURE_2D);
+    glLoadIdentity();
+    glDepthMask(false);
+    
+    //se carga imagen
+    Image* image = loadBMP("Images/howto.bmp");
+    loadTextureMain(image, 0);
+    glBindTexture(GL_TEXTURE_2D, texturasMain[0]);
+    //se dibuja imagen con textura
+    glBegin(GL_POLYGON);
+    glTexCoord2f( 0, 0 );
+    glVertex2d( -156, -20 );
+    glTexCoord2f( 1, 0 );
+    glVertex2d( 156, -20 );
+    glTexCoord2f( 1, 1 );
+    glVertex2d( 156, 20 );
+    glTexCoord2f( 0, 1);
+    glVertex2d( -156, 20 );
+    glEnd();
+    glColor4fv(mat_emission);
+    
+    glDepthMask( true );
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    //hace el hexagono blanco
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glBegin(GL_POLYGON);
+    glVertex2f( -184, 0 );
+    glVertex2f( -158, -26 );
+    glVertex2f( 158, -26 );
+    glVertex2d( 184, 0);
+    glVertex2f( 158, 26 );
+    glVertex2d( -158, 26);
+    glEnd();
+    
+    glPopMatrix();
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_COLOR_MATERIAL);
+}
+
+void pintaMenu(){
+    pintaLogo();
+    botonStart();
+    botonHowto();
 }
 
 void display()
@@ -833,7 +911,9 @@ void display()
         glDisable(GL_LIGHT0);
         pintaMenu();
         glEnable(GL_LIGHT0);
-        
+        dibujaDot();
+        light_posDOT[0] = 0;
+        light_posDOT[1] = 0;
     }
     else if (menu == 2) {
         vectorEnemigos.clear();
@@ -846,11 +926,83 @@ void display()
         carga = M_PI*2;
         light_posDOT[0] = 0;
         light_posDOT[1] = 0;
+        colorDOT[0] = 1;
+        colorDOT[1] = 1;
+        colorDOT[2] = 1;
         //dibuja pantalla de perdiste
         stringstream puntaje;
         puntaje << puntos;
-        escribirTexto("GAME OVER", -50, 0, GLUT_BITMAP_TIMES_ROMAN_24);
-        escribirTexto("Your Score: " + puntaje.str(), -50, -25, GLUT_BITMAP_TIMES_ROMAN_24);
+        
+        glEnable(GL_COLOR_MATERIAL);
+        
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glTranslated(0, 100, 0);
+        //hace hexagono negro
+        glPushMatrix();
+        float colorHex [] = {0,0,0,0};
+        glColorMaterial(GL_FRONT,GL_EMISSION);
+        glColor4fv(colorHex);
+        glBegin(GL_POLYGON);
+        glVertex2f( -240, 0 );
+        glVertex2f( -175, -94 );
+        glVertex2f( 175, -94 );
+        glVertex2d( 240, 0);
+        glVertex2f( 175, 94 );
+        glVertex2d( -175, 94);
+        glEnd();
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        //hace el bind de la textura
+        glPushMatrix();
+        glColorMaterial(GL_FRONT,GL_EMISSION);
+        glColor4fv(colorDOT);
+        glEnable(GL_TEXTURE_2D);
+        glLoadIdentity();
+        glDepthMask(false);
+        
+        //se carga imagen
+        Image* image = loadBMP("Images/gameover.bmp");
+        loadTextureMain(image, 0);
+        glBindTexture(GL_TEXTURE_2D, texturasMain[0]);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        //se dibuja imagen con textura
+        glBegin(GL_POLYGON);
+        glTexCoord2f( 0, 0 );
+        glVertex2f( -173, -90 );
+        glTexCoord2f( 1, 0 );
+        glVertex2f( 173, -90 );
+        glTexCoord2f( 1, 1 );
+        glVertex2f( 173, 90 );
+        glTexCoord2f( 0, 1);
+        glVertex2f( -173, 90 );
+        glEnd();
+        glColor4fv(mat_emission);
+        
+        glDepthMask( true );
+        glDisable(GL_TEXTURE_2D);
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        //hace el hexagono blanco
+        glPushMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glColorMaterial(GL_FRONT,GL_EMISSION);
+        glColor4fv(colorDOT);
+        glBegin(GL_POLYGON);
+        glVertex2f( -243, 0 );
+        glVertex2f( -177, -97 );
+        glVertex2f( 177, -97 );
+        glVertex2d( 243, 0);
+        glVertex2f( 177, 97 );
+        glVertex2d( -177, 97);
+        glEnd();
+        
+        glPopMatrix();
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        glDisable(GL_COLOR_MATERIAL);
+        
+        escribirTexto("Your Score: " + puntaje.str(), -55, -25, GLUT_BITMAP_TIMES_ROMAN_24);
     }
     //dibuja Juego
     else if (vidas > 0) {
