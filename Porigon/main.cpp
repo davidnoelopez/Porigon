@@ -24,14 +24,19 @@
 
 using namespace std;
 const float medida = 25;  // Mitad del tamaño de cada lado del cubo
-int angulo=0;
-int anguloX=0;
-int anguloY=0;
-int anguloZ=0;
+
+/* variables explosion */
 int explode=0;
+float xe, ye;
+float expRadio = 0, expGrosor, trans, maxDist;
+
+//Cantidad de balas
 int bullet=0;
-float xY, yY, xZ,yZ, x, y, xd, yd, xa, xb, yb, ya, xe, ye, es=20, trans=0.55;
-int x1=0, x2=0;
+
+//variables para posicion de DOT
+float x, y, xd, yd, xa, ya;
+
+//tamaño inicial de pantalla
 int	screenWidth = 800, screenHeight = 800;
 float carga = M_PI*2;
 int maxEnemigos = 10;
@@ -43,55 +48,30 @@ int puntos = 0;
 float dificultad = 1, aumento = 100;
 bool boss = false;
 int vidas = 0;
-bool menu = true;
+int menu = 1;
 GLuint backgroundMenu;
 
-//  Initialize light source and shading model (GL_FLAT).
+//  variables para inicializar luces
 
 float mat_specular [] = {0.0,0.0,0.0,1.0};
 float mat_emission [] = {0.0,0.0,0.0,1.0};
 float mat_ambient_diffuse [] = {0.5,0.5,0.5,1.0};
 float mat_shininess = 0.4*128;
 float spot_dir [] = {0.0,0.0,-1.0};
-float spot_cutoff = 170.0;
-float spot_exponent = 0.0;
+float spot_cutoff = 30.0;
+float spot_exponent = 1.0;
 float light_ambient [] = {0.5,0.5,0.5,1.0};
 float light_diffuse_specular [] = {0.8,0.8,0.8,1.0};
 float light_pos [] = {0.0,0.0,3.0, 1.0};
+float light_posDOT [] = {0.0,0.0,-900.0, 1.0};
 float colorDOT [] = {1.0,1.0,1.0,1.0};
 
+//para luz1
+float spot_cutoff1 = 30.0;
+float spot_exponent1 = 1.0;
+float light_ambient1 [] = {0.2,0.2,0.2,1.0};
+float light_diffuse_specular1 [] = {0.8,0.8,0.8,1.0};
 
-void dibujaDot(){
-    //cambia el color del DOT si es golpeado
-    if (hit) {
-        colorDOT[0] = 1.0;
-        colorDOT[1] = 0.0;
-        colorDOT[2] = 0.0;
-        hit--;
-    }
-    else{
-        colorDOT[0] = 1.0;
-        colorDOT[1] = 1.0;
-        colorDOT[2] = 1.0;
-    }
-    
-    //movimiento fluido
-    if(xd!=0 && yd!=0){
-        xa=xa+(xd-xa)/10;
-        ya=ya+(yd-ya)/10;
-    }
-    
-    //dibuja DOT
-    glPushMatrix ();
-    glTranslatef(xa, ya, 0);
-    glColorMaterial(GL_FRONT,GL_EMISSION);
-    glEnable(GL_COLOR_MATERIAL);
-    glColor4fv(colorDOT);
-    glutSolidSphere(10, 50, 50);
-    glColor4fv(mat_emission);
-    glDisable(GL_COLOR_MATERIAL);
-    glPopMatrix ();
-}
 
 void escribirTexto(std::string texto, double x, double y, void * font)
 {
@@ -115,7 +95,7 @@ void pintarVidas() {
     for (int i = 0; i < vidas; i++) {
         glPushMatrix();
         glTranslatef(vidasX+60+15*i, vidasY+5, 0);
-        glutSolidSphere(5, 10, 10);
+        glutSolidSphere(5, 20, 20);
         glPopMatrix();
     }
 }
@@ -150,9 +130,9 @@ void pintarMarcador()
 }
 
 //Se crea arco
-void dibujaArco(float cx, float cy, float r, float start_angle, float arc_angle, int num_segments)
+void dibujaArco(float cx, float cy, float r, float start_angle, int num_segments)
 {
-    float theta = arc_angle / float(num_segments - 1);//theta is now calculated from the arc angle instead, the - 1 bit comes from the fact that the arc is open
+    float theta = carga / float(num_segments - 1);//theta is now calculated from the arc angle instead, the - 1 bit comes from the fact that the arc is open
     
     float tangetial_factor = tanf(theta);
     
@@ -161,44 +141,165 @@ void dibujaArco(float cx, float cy, float r, float start_angle, float arc_angle,
     
     float xr = r * cosf(start_angle);//we now start at the start angle
     float yr = r * sinf(start_angle);
-    glColor4f( 0.5f, 0.5f, 0.5f, 1.0f );
-    glBegin(GL_LINE_STRIP);//since the arc is not a closed curve, this is a strip now
-    for(int ii = 0; ii < num_segments; ii++)
-    {
-        glVertex2f(xr + cx, yr + cy);
+    if (carga >= M_PI*2) {
+        glColor4f(0.075, 0.008, 0.673, 1.0f);
+        glPushMatrix();
+        glTranslatef(xa, ya, 1);
+        glutSolidTorus(1, r, 50, 50);
+        glPopMatrix();
         
-        float tx = -yr;
-        float ty = xr;
-        
-        xr += tx * tangetial_factor;
-        yr += ty * tangetial_factor;
-        
-        xr *= radial_factor;
-        yr *= radial_factor;
-    } 
-    glEnd(); 
+    }
+    else {
+        glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+        glBegin(GL_LINE_STRIP);//since the arc is not a closed curve, this is a strip now
+        for(int ii = 0; ii < num_segments; ii++)
+        {
+            glVertex2f(xr + cx, yr + cy);
+            
+            float tx = -yr;
+            float ty = xr;
+            
+            xr += tx * tangetial_factor;
+            yr += ty * tangetial_factor;
+            
+            xr *= radial_factor;
+            yr *= radial_factor;
+        }
+        glEnd();
+    }
+    if (expRadio > 0) {
+        glColor4f( 0.075, 0.008, 0.673, 0 );
+        glPushMatrix();
+        glTranslatef(xe, ye, 1);
+        glutSolidTorus(expGrosor, expRadio, 50, 50);
+        glPopMatrix();
+    }
 }
 
-//Se crea explocion
-void dotExplode(){
-    //se da el tamaño del punto
-    glPointSize(es);
-    if(es>=50){
-        trans-=0.03;        //calcula transparencia
+void dibujaDot(){
+    //cambia el color del DOT si es golpeado
+    if (hit) {
+        colorDOT[0] = 1.0;
+        colorDOT[1] = 0.0;
+        colorDOT[2] = 0.0;
+        hit--;
     }
-    es+=0.5;                //calcula tamaño
-    carga+=.01265822785*M_PI*2;
-    
-    glColor4f( 1.0f, 1.0f, 1.0f, trans);
-    glBegin(GL_POINTS);
-    glVertex3f(xe, ye, -1);
-	glEnd();
-    
-    if(trans<=0){
-        explode=0;
-        es=20;
-        trans=0.55;
+    else{
+        colorDOT[0] = 1.0;
+        colorDOT[1] = 1.0;
+        colorDOT[2] = 1.0;
     }
+    
+    //movimiento fluido
+    if(xd!=0 && yd!=0){
+        xa=xa+(xd-xa)/10;
+        ya=ya+(yd-ya)/10;
+    }
+    
+    //dibuja DOT
+    glEnable(GL_COLOR_MATERIAL);
+    glPushMatrix ();
+    glTranslatef(xa, ya, 0);
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glutSolidSphere(10, 50, 50);
+    glColor4fv(mat_emission);
+    glPopMatrix ();
+    dibujaArco(xa, ya, 13, M_PI/2, 100);
+    glDisable(GL_COLOR_MATERIAL);
+    
+    //cambia posicion de la luz
+    if (expRadio == 0) {
+        light_posDOT[0] = xa;
+        light_posDOT[1] = ya;
+    }
+    if (expRadio == 0 && light_posDOT[2] > -900) {
+        light_posDOT[2]-=12;
+    }
+}
+
+//timer para generar carga de arco
+void cargaArc(int state) {
+    if (carga < M_PI*2)
+    {
+        carga+=.001*M_PI*2;
+        glutTimerFunc(70, cargaArc, 1);
+    }
+    else {
+        explode = 0;
+    }
+}
+
+//timer para explosion del arco
+void arcExplode(int state) {
+    glColor4f( 0.5f, 0.5f, 0.5f, 1.0f );
+    switch (state) {
+        //empieza explosion
+        case 1:{
+            carga = 0;
+            xe=xa;
+            ye=ya;
+            explode=1;
+            expRadio = 13;
+            expGrosor = 1;
+            expRadio++;
+            trans = 1;
+            maxDist = 0;
+            light_posDOT[0]=xe;
+            light_posDOT[1]=ye;
+            //revisa la distancia mas grande a alguna de las esquinas
+            for (int i = 0; i < 4; i++) {
+                float xAux = 0, yAux = 0;
+                switch (i) {
+                    case 0:
+                        xAux = -screenWidth/2;
+                        yAux = screenHeight/2;
+                        break;
+                    case 2:
+                        xAux = -screenWidth/2;
+                        yAux = -screenHeight/2;
+                        break;
+                    case 3:
+                        xAux = screenWidth/2;
+                        yAux = -screenHeight/2;
+                        break;
+                    case 4:
+                        xAux = screenWidth/2;
+                        yAux = screenHeight/2;
+                        break;
+                    default:
+                        break;
+                }
+                if (maxDist<sqrtf( powf((xAux-xe), 2)+powf((yAux-ye), 2) )) {
+                    maxDist = sqrtf( powf((xAux-xe), 2)+powf((yAux-ye), 2) );
+                }
+            }
+            
+            glutTimerFunc(70, cargaArc, 1);
+            glutPostRedisplay();
+            glutTimerFunc(1, arcExplode, 2);
+            break;
+        }
+        //genera explosion
+        case 2: {
+            if (expRadio-expGrosor < maxDist) {
+                expRadio+=2;
+                expGrosor+=.015;
+                trans-=.1;
+                light_posDOT[2]+=3;
+                
+                glutPostRedisplay();
+                glutTimerFunc(1, arcExplode, 2);
+            }
+            else {
+                expRadio = 0;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    
 }
 
 void moverBalas(){
@@ -206,6 +307,7 @@ void moverBalas(){
         for (int index = 0; index < sizeof(arregloBalas)/sizeof(*arregloBalas); index++) {
             if (arregloBalas[index].viva) {
                 float focus_emission [] = {1.0,0.0,0.1,1.0};
+                float mat_emissionBala [] = {1.0,1.0,1.0,1.0};
                 glPushMatrix();
                 //pone color
                 glColorMaterial(GL_FRONT,GL_EMISSION);
@@ -276,7 +378,7 @@ void moverBalas(){
                         break;
                 }
                 glMaterialf(GL_FRONT, GL_SHININESS, 127.0);
-                glColor4fv(mat_emission);
+                glColor4fv(mat_emissionBala);
                 glDisable(GL_COLOR_MATERIAL);
                 glPopMatrix();
             }
@@ -325,9 +427,18 @@ void myMouse(int button, int state, int mouseX, int mouseY)
     x = mouseX;
     y = screenHeight - mouseY;
     //click en el menu, inicia juego con 3 vidas
-        if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && menu){
-            menu = false;
-            vidas = 3;
+        if (button == GLUT_LEFT_BUTTON && state == GLUT_UP ){
+            switch (menu) {
+                case 1:
+                    menu = 0;
+                    vidas = 3;
+                    break;
+                case 2:
+                    menu = 1;
+                default:
+                    break;
+            }
+            
         }
 }
 
@@ -340,10 +451,7 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
         {
             case ' ':
                 if ( explode == 0 ) {
-                    explode=1;
-                    xe=xa;
-                    ye=ya;
-                    carga = 0;
+                    glutTimerFunc(5, arcExplode, 1);
                 }
                 break;
             case 'A':
@@ -364,12 +472,13 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
 
 void myPasMouse(int mouseX, int mouseY)
 {
-    x = mouseX;
-    y = screenHeight - mouseY;
-    glColor3f( 1.0f, 1.0f, 1.0f );
-    xd=x-screenWidth/2;
-    yd=y-screenHeight/2;
-    
+    if (menu == 0) {
+        x = mouseX;
+        y = screenHeight - mouseY;
+        glColor3f( 1.0f, 1.0f, 1.0f );
+        xd=x-screenWidth/2;
+        yd=y-screenHeight/2;
+    }
 }
 
 void crearEnemigos(int v)
@@ -407,7 +516,6 @@ void crearEnemigos(int v)
             auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight)+screenHeight/2, tipoRandom);
             vectorEnemigos.push_back(auxenemigo);
         }
-        
     }
     
     glutPostRedisplay();
@@ -418,6 +526,13 @@ int revisarColisionBalas(int vec)
 {
     int result = 0;
     int tamanio = sizeof(arregloBalas)/sizeof(*arregloBalas);
+    if (expRadio > 0) {
+        float distancia = sqrtf( powf((vectorEnemigos.at(vec)->x-xe), 2)+powf((vectorEnemigos.at(vec)->y-ye), 2));
+        if (distancia < expRadio+vectorEnemigos.at(vec)->size/2 && distancia > expRadio-vectorEnemigos.at(vec)->size/2  ){
+            vectorEnemigos.at(vec)->vida = 0;
+            return 1;
+        }
+    }
     if (bullet)
         for (int count = 0; count < tamanio; count++) {
             if (arregloBalas[count].viva) {
@@ -484,9 +599,14 @@ void dibujarEnemigos()
                 if (colicionBalas == 0) {
                     hit = 5;
                     vidas--;
-                    vectorEnemigos.erase(vectorEnemigos.begin()+n);
-                    tam--;
-                    n--;
+                    if (vidas == 0) {
+                        menu = 2;
+                    }
+                    else {
+                        vectorEnemigos.erase(vectorEnemigos.begin()+n);
+                        tam--;
+                        n--;
+                    }
                 }
                 else if(colicionBalas == 1 && vectorEnemigos.at(n)->vida == 0){
                     
@@ -503,6 +623,10 @@ void dibujarEnemigos()
 
 //Grid inferior
 void crearGrid(){
+    glDisable(GL_LIGHT0);
+    glLightfv(GL_LIGHT1,GL_SPOT_DIRECTION,spot_dir);
+    glLightfv( GL_LIGHT1, GL_POSITION, light_posDOT );
+    glEnable(GL_LIGHT1);
     float colorGrid [] = {1.0,0.0,1.0,1.0};
     //cambia color del grid cuando es golpeado
     if (hit > 0) {
@@ -513,6 +637,7 @@ void crearGrid(){
     }
     //color default del grid
     else{
+        glColor3f(.1, .1, .1);
         colorGrid[0] = 0.1;
         colorGrid[1] = 0.1;
         colorGrid[2] = 0.1;
@@ -531,6 +656,8 @@ void crearGrid(){
     glColor4fv(mat_emission);
     glDisable(GL_COLOR_MATERIAL);
     glPopMatrix();
+    glDisable(GL_LIGHT1);
+    glEnable(GL_LIGHT0);
 }
 
 void time(int v)
@@ -553,8 +680,62 @@ void loadTexture(Image* image){
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
 }
 
+void pintaLogo(){
+    glEnable(GL_COLOR_MATERIAL);
+    //D
+    glPushMatrix();
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glTranslatef(-180, 0, 0);
+    
+    glBegin(GL_TRIANGLE_FAN);
+    float x1=0,y1=0;
+    glVertex2f(x1, y1);
+    
+    for (float angle = 0; angle< 90; angle+=.1){
+        
+        if((x1 + sin(angle) * 80)>=0)
+            glVertex2f(x1 + sin(angle) * 80, y1 + cos(angle) * 80);
+        
+    }
+    glVertex2f(0, -80);
+    glEnd();
+    glColor4fv(mat_emission);
+    glPopMatrix();
+    
+    //O
+    glPushMatrix();
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glutSolidSphere(80, 50, 50);
+    glColor4fv(mat_emission);
+    glPopMatrix();
+    
+    //T
+    glPushMatrix();
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glTranslatef(100, 0, 0);
+    
+    glBegin(GL_QUADS);
+    glVertex2f(40,80);
+    glVertex2f(40,-80);
+    glVertex2f(80,-80);
+    glVertex2f(80,80);
+    
+    glVertex2f(0,20);
+    glVertex2f(0,-20);
+    glVertex2f(80,-20);
+    glVertex2f(80,20);
+    glEnd();
+    
+    glColor4fv(mat_emission);
+    glPopMatrix();
+    glDisable(GL_COLOR_MATERIAL);
+}
+
 void pintaMenu(){
-    glMatrixMode(GL_PROJECTION);
+    /*glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -581,19 +762,36 @@ void pintaMenu(){
     glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
+	glMatrixMode(GL_MODELVIEW);*/
+    
+    pintaLogo();
+    
 }
 
 void display()
 {
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (menu) {
+    crearGrid();
+    if (menu == 1) {
+        light_posDOT[2] = -500;
         glEnable(GL_TEXTURE_2D);
+        glDisable(GL_LIGHTING);
         pintaMenu();
+        glEnable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
     }
-    else if (vidas <= 0) {
+    else if (menu == 2) {
+        vectorEnemigos.clear();
+        for (int index = 0; index < sizeof(arregloBalas)/sizeof(*arregloBalas); index++) {
+            arregloBalas[index].viva = 0;
+        }
+        xa = 0;
+        ya = 0;
+        hit = 0;
+        carga = M_PI*2;
+        light_posDOT[0] = 0;
+        light_posDOT[1] = 0;
         //dibuja pantalla de perdiste
         stringstream puntaje;
         puntaje << puntos;
@@ -604,13 +802,9 @@ void display()
     else if (vidas > 0) {
         pintarVidas();
         pintarMarcador();
-        crearGrid();
+        
         glLineWidth(2);
         dibujaDot();
-        dibujaArco(xa, ya, 13, M_PI/2, carga, 100);
-        if(explode){
-            dotExplode();
-        }
         if (bullet > 0) {
             moverBalas();
         }
@@ -625,6 +819,8 @@ void init(){
     glClearColor(0.0,0.0,0.0,0.0);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_FALSE);
     glEnable(GL_LIGHTING);
+    
+    //light0
     glLightfv(GL_LIGHT0,GL_AMBIENT,light_ambient);
     glLightfv(GL_LIGHT0,GL_DIFFUSE,light_diffuse_specular);
     glLightfv(GL_LIGHT0,GL_SPECULAR,light_diffuse_specular);
@@ -633,11 +829,18 @@ void init(){
     glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,1.0);
     glLightfv( GL_LIGHT0, GL_POSITION, light_pos );
     glEnable(GL_LIGHT0);
+    
+    //light1
+    glLightfv(GL_LIGHT1,GL_AMBIENT,light_ambient1);
+    glLightfv(GL_LIGHT1,GL_DIFFUSE,light_diffuse_specular1);
+    glLightfv(GL_LIGHT1,GL_SPECULAR,light_diffuse_specular1);
+    glLightf(GL_LIGHT1,GL_SPOT_CUTOFF,spot_cutoff1);
+    glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,1.0);
+    glLightf(GL_LIGHT1,GL_SPOT_EXPONENT,spot_exponent1);
+    
     glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, mat_ambient_diffuse);
     glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
     glMaterialf(GL_FRONT,GL_SHININESS,mat_shininess);
-    //glEnable(GL_TEXTURE_2D);
-
 }
 
 int main(int argc, char** argv)

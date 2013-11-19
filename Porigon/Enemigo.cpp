@@ -47,7 +47,7 @@ Enemigo::Enemigo ( float posx, float posy, int t)
         {
             size = 25;
             vida = 4;
-            velocidad = rand()%2+2;
+            velocidad = rand()%3+1;
             break;
         }
         case 10:
