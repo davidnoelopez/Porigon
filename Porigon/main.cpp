@@ -49,7 +49,9 @@ float dificultad = 1, aumento = 100;
 bool boss = false;
 int vidas = 0;
 int menu = 1;
+
 GLuint backgroundMenu;
+static GLuint texturas[6];
 
 //  variables para inicializar luces
 
@@ -58,19 +60,22 @@ float mat_emission [] = {0.0,0.0,0.0,1.0};
 float mat_ambient_diffuse [] = {0.5,0.5,0.5,1.0};
 float mat_shininess = 0.4*128;
 float spot_dir [] = {0.0,0.0,-1.0};
-float spot_cutoff = 30.0;
+
+//para luz0
+float spot_cutoff = 30;
 float spot_exponent = 1.0;
 float light_ambient [] = {0.5,0.5,0.5,1.0};
 float light_diffuse_specular [] = {0.8,0.8,0.8,1.0};
 float light_pos [] = {0.0,0.0,3.0, 1.0};
-float light_posDOT [] = {0.0,0.0,-900.0, 1.0};
-float colorDOT [] = {1.0,1.0,1.0,1.0};
 
-//para luz1
+
+//para luz1 sobre DOT pero Afecta grid
 float spot_cutoff1 = 30.0;
 float spot_exponent1 = 1.0;
 float light_ambient1 [] = {0.2,0.2,0.2,1.0};
 float light_diffuse_specular1 [] = {0.8,0.8,0.8,1.0};
+float light_posDOT [] = {0.0,0.0,-900.0, 1.0};
+float colorDOT [] = {1.0,1.0,1.0,1.0};
 
 
 void escribirTexto(std::string texto, double x, double y, void * font)
@@ -89,6 +94,7 @@ void escribirTexto(std::string texto, double x, double y, void * font)
 }
 
 void pintarVidas() {
+    glEnable(GL_COLOR_MATERIAL);
     float vidasY = screenHeight/2-(screenHeight/25)*1.7;
     float vidasX = -screenWidth/2+screenWidth/25;
     escribirTexto("Vidas: ", vidasX, vidasY, GLUT_BITMAP_HELVETICA_18);
@@ -98,6 +104,7 @@ void pintarVidas() {
         glutSolidSphere(5, 20, 20);
         glPopMatrix();
     }
+    glDisable(GL_COLOR_MATERIAL);
 }
 
 void pintarMarcador()
@@ -177,6 +184,7 @@ void dibujaArco(float cx, float cy, float r, float start_angle, int num_segments
 }
 
 void dibujaDot(){
+    
     //cambia el color del DOT si es golpeado
     if (hit) {
         colorDOT[0] = 1.0;
@@ -283,7 +291,7 @@ void arcExplode(int state) {
         //genera explosion
         case 2: {
             if (expRadio-expGrosor < maxDist) {
-                expRadio+=2;
+                expRadio+=3;
                 expGrosor+=.015;
                 trans-=.1;
                 light_posDOT[2]+=3;
@@ -567,7 +575,7 @@ void dibujarEnemigos()
             if ((((vectorEnemigos.at(n)->x + vectorEnemigos.at(n)->size/2) < xa-10 || (vectorEnemigos.at(n)->x - vectorEnemigos.at(n)->size/2) > xa+10) ||
                 ((vectorEnemigos.at(n)->y + vectorEnemigos.at(n)->size/2) < ya-10 || (vectorEnemigos.at(n)->y - vectorEnemigos.at(n)->size/2) > ya+10)) &&
                 vectorEnemigos.at(n)->vida > 0) {
-                
+                //cambio en x de enemigo
                 if (xa-7 > vectorEnemigos.at(n)->x){
                     if(((xa-vectorEnemigos.at(n)->x)/200)>vectorEnemigos.at(n)->velocidad)
                         vectorEnemigos.at(n)->x += (vectorEnemigos.at(n)->velocidad*((xa-vectorEnemigos.at(n)->x)/200))*dificultad;
@@ -580,6 +588,8 @@ void dibujarEnemigos()
                     else
                         vectorEnemigos.at(n)->x -=vectorEnemigos.at(n)->velocidad*dificultad;
                 }
+                
+                //cambio en y de enemigo
                 if (ya-7 > vectorEnemigos.at(n)->y){
                     if(((ya-vectorEnemigos.at(n)->y)/200)>vectorEnemigos.at(n)->velocidad)
                         vectorEnemigos.at(n)->y += (vectorEnemigos.at(n)->velocidad*((ya-vectorEnemigos.at(n)->y)/200))*dificultad;
@@ -657,7 +667,7 @@ void crearGrid(){
     glDisable(GL_COLOR_MATERIAL);
     glPopMatrix();
     glDisable(GL_LIGHT1);
-    glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHT0);
 }
 
 void time(int v)
@@ -667,8 +677,8 @@ void time(int v)
 }
 
 //Makes the image into a texture, and returns the id of the texture
-void loadTexture(Image* image){
-    glBindTexture(GL_TEXTURE_2D, backgroundMenu);
+void loadTextureMain(Image* image, int k){
+    glBindTexture(GL_TEXTURE_2D, texturas[k]);
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -681,6 +691,12 @@ void loadTexture(Image* image){
 }
 
 void pintaLogo(){
+    glColor3f(1, 1, 1);
+    colorDOT[0] = 1.0;
+    colorDOT[1] = 1.0;
+    colorDOT[2] = 1.0;
+    glPushMatrix();
+    glTranslated(0, 100, 0);
     glEnable(GL_COLOR_MATERIAL);
     //D
     glPushMatrix();
@@ -732,54 +748,90 @@ void pintaLogo(){
     glColor4fv(mat_emission);
     glPopMatrix();
     glDisable(GL_COLOR_MATERIAL);
+    glPopMatrix();
 }
 
 void pintaMenu(){
-    /*glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    glDepthMask(false);
-    
-    //se carga imagen
-    Image* image = loadBMP("startMenu.bmp");
-    loadTexture(image);
-    glBindTexture(GL_TEXTURE_2D, backgroundMenu);
-    
-    //se dibuja imagen con textura
-    glBegin(GL_QUADS);
-    glTexCoord2f( 0, 0 );
-    glVertex2f( -screenWidth/2, -screenHeight/2 );
-    glTexCoord2f( 0, 1 );
-    glVertex2f( -screenWidth/2, screenHeight/2 );
-    glTexCoord2f( 1, 1 );
-    glVertex2f( screenWidth/2, screenHeight/2 );
-    glTexCoord2f( 1, 0);
-    glVertex2f( screenWidth/2, -screenHeight/2 );
-    glEnd();
-    glDepthMask( true );
-    glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);*/
-    
     pintaLogo();
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_COLOR_MATERIAL);
     
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+        glColorMaterial(GL_FRONT,GL_EMISSION);
+        glColor4fv(colorDOT);
+        glTranslated(0, -40, 0);
+    //hace hexagono exterior
+        glPushMatrix();
+            glBegin(GL_POLYGON);
+            glVertex2f( -100, 0 );
+            glVertex2f( -80, -20 );
+            glVertex2f( 80, -20 );
+            glVertex2d( 100, 0);
+            glVertex2f( 80, 20 );
+            glVertex2d( -80, 20);
+            glEnd();
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+    //hace el bind de la textura
+        glPushMatrix();
+            glLoadIdentity();
+            glDepthMask(false);
+
+            //se carga imagen
+            Image* image = loadBMP("Images/start.bmp");
+            loadTextureMain(image, 0);
+            glBindTexture(GL_TEXTURE_2D, texturas[0]);
+            //se dibuja imagen con textura
+            glBegin(GL_QUADS);
+            glTexCoord2f( 0, 0 );
+            glVertex2f( -80, -20 );
+            glTexCoord2f( 0, 1 );
+            glVertex2f( -80, 20 );
+            glTexCoord2f( 1, 1 );
+            glVertex2f( 80, 20 );
+            glTexCoord2f( 1, 0);
+            glVertex2f( 80, -20 );
+            glEnd();
+            glColor4fv(mat_emission);
+            
+            glDepthMask( true );
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+    //hace el hexagono blanco
+        glPushMatrix();
+            glColorMaterial(GL_FRONT,GL_EMISSION);
+            glColor4fv(colorDOT);
+            glBegin(GL_POLYGON);
+            glVertex2f( -102, 0 );
+            glVertex2f( -82, -22 );
+            glVertex2f( 82, -22 );
+            glVertex2d( 102, 0);
+            glVertex2f( 82, 22 );
+            glVertex2d( -82, 22);
+            glEnd();
+        glPopMatrix();
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    
+    glDisable(GL_TEXTURE_2D);
+    
+    glDisable(GL_COLOR_MATERIAL);
 }
 
 void display()
 {
+    //quita el cursor
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //genera el grid de background
     crearGrid();
     if (menu == 1) {
         light_posDOT[2] = -500;
-        glEnable(GL_TEXTURE_2D);
-        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHT0);
         pintaMenu();
-        glEnable(GL_LIGHTING);
-        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_LIGHT0);
+        
     }
     else if (menu == 2) {
         vectorEnemigos.clear();
@@ -828,14 +880,14 @@ void init(){
     glLightf(GL_LIGHT0,GL_SPOT_EXPONENT,spot_exponent);
     glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,1.0);
     glLightfv( GL_LIGHT0, GL_POSITION, light_pos );
-    glEnable(GL_LIGHT0);
+    glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,spot_dir);
     
     //light1
     glLightfv(GL_LIGHT1,GL_AMBIENT,light_ambient1);
     glLightfv(GL_LIGHT1,GL_DIFFUSE,light_diffuse_specular1);
     glLightfv(GL_LIGHT1,GL_SPECULAR,light_diffuse_specular1);
     glLightf(GL_LIGHT1,GL_SPOT_CUTOFF,spot_cutoff1);
-    glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,1.0);
+    glLightf(GL_LIGHT1,GL_CONSTANT_ATTENUATION,1.0);
     glLightf(GL_LIGHT1,GL_SPOT_EXPONENT,spot_exponent1);
     
     glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, mat_ambient_diffuse);
