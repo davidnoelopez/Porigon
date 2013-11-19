@@ -800,16 +800,18 @@ void pintaMenu(){
         glMatrixMode(GL_PROJECTION);
     //hace el hexagono blanco
         glPushMatrix();
+            glDisable(GL_TEXTURE_2D);
             glColorMaterial(GL_FRONT,GL_EMISSION);
             glColor4fv(colorDOT);
             glBegin(GL_POLYGON);
-            glVertex2f( -102, 0 );
+            glVertex2f( -103, 0 );
             glVertex2f( -82, -22 );
             glVertex2f( 82, -22 );
-            glVertex2d( 102, 0);
+            glVertex2d( 103, 0);
             glVertex2f( 82, 22 );
             glVertex2d( -82, 22);
             glEnd();
+    
         glPopMatrix();
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
