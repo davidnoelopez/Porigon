@@ -10,13 +10,15 @@
 #define __Porigon__Bala__
 
 #include <iostream>
-
+#include "Sound.h"
+#include "Sound.h"
 class Bala
 {
 public:
     float x, y;
     int direccion;
     int viva;
+    Sound *sonido;
     Bala ();
     Bala ( float posx, float posy, int dir ); //constructor
 };

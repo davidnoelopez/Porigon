@@ -14,6 +14,8 @@
 		5551AD211803050400B07964 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5551AD1F1803050400B07964 /* OpenGL.framework */; };
 		555EB882181759BB0004DDA8 /* Enemigo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 555EB880181759BB0004DDA8 /* Enemigo.cpp */; };
 		55E02274180D0B2B006B50FF /* Bala.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55E02272180D0B2B006B50FF /* Bala.cpp */; };
+		55F4F06A183C42CF0018041E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 55F4F069183C42CF0018041E /* OpenAL.framework */; };
+		55F4F070183C4BEE0018041E /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55F4F06E183C4BEE0018041E /* Sound.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -40,6 +42,7 @@
 		5551AD1F1803050400B07964 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		555EB880181759BB0004DDA8 /* Enemigo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Enemigo.cpp; sourceTree = "<group>"; };
 		555EB881181759BB0004DDA8 /* Enemigo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Enemigo.h; sourceTree = "<group>"; };
+		55623DE3183C7291004E2F45 /* aboutdisplay.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = aboutdisplay.bmp; sourceTree = "<group>"; };
 		557875C3183B084B00F7E064 /* Textura1.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = Textura1.bmp; sourceTree = "<group>"; };
 		557875C7183B0A1600F7E064 /* about.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = about.bmp; sourceTree = "<group>"; };
 		557875C8183B0A1600F7E064 /* gameover.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = gameover.bmp; sourceTree = "<group>"; };
@@ -49,6 +52,9 @@
 		557875CC183B0A1600F7E064 /* start.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = start.bmp; sourceTree = "<group>"; };
 		55E02272180D0B2B006B50FF /* Bala.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Bala.cpp; sourceTree = "<group>"; };
 		55E02273180D0B2B006B50FF /* Bala.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bala.h; sourceTree = "<group>"; };
+		55F4F069183C42CF0018041E /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		55F4F06E183C4BEE0018041E /* Sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sound.cpp; sourceTree = "<group>"; };
+		55F4F06F183C4BEE0018041E /* Sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sound.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55F4F06A183C42CF0018041E /* OpenAL.framework in Frameworks */,
 				5551AD201803050400B07964 /* GLUT.framework in Frameworks */,
 				5551AD211803050400B07964 /* OpenGL.framework in Frameworks */,
 			);
@@ -67,6 +74,7 @@
 		5551AD09180304FA00B07964 = {
 			isa = PBXGroup;
 			children = (
+				55F4F069183C42CF0018041E /* OpenAL.framework */,
 				5551AD1E1803050400B07964 /* GLUT.framework */,
 				5551AD1F1803050400B07964 /* OpenGL.framework */,
 				5551AD14180304FA00B07964 /* Porigon */,
@@ -85,6 +93,7 @@
 		5551AD14180304FA00B07964 /* Porigon */ = {
 			isa = PBXGroup;
 			children = (
+				55F4F06B183C4BC80018041E /* Audio */,
 				557875BF183B084B00F7E064 /* Images */,
 				5525E1621839E5A4005760F6 /* startMenu.bmp */,
 				550223CA18383C1000124E3A /* ImageLoader.cpp */,
@@ -103,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				557875C7183B0A1600F7E064 /* about.bmp */,
+				55623DE3183C7291004E2F45 /* aboutdisplay.bmp */,
 				557875C8183B0A1600F7E064 /* gameover.bmp */,
 				557875C9183B0A1600F7E064 /* howto.bmp */,
 				557875CA183B0A1600F7E064 /* playagain.bmp */,
@@ -112,6 +122,15 @@
 			);
 			path = Images;
 			sourceTree = "<group>";
+		};
+		55F4F06B183C4BC80018041E /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				55F4F06E183C4BEE0018041E /* Sound.cpp */,
+				55F4F06F183C4BEE0018041E /* Sound.h */,
+			);
+			path = Audio;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -168,6 +187,7 @@
 				55E02274180D0B2B006B50FF /* Bala.cpp in Sources */,
 				550223CB18383C1000124E3A /* ImageLoader.cpp in Sources */,
 				555EB882181759BB0004DDA8 /* Enemigo.cpp in Sources */,
+				55F4F070183C4BEE0018041E /* Sound.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,6 +7,8 @@
 //
 //
 
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #include <GLUT/glut.h>
 #include <iostream>
 #include <vector>
@@ -19,6 +21,7 @@
 #include "Bala.h"
 #include "Enemigo.h"
 #include "imageloader.h"
+#include "Sound.h"
 
 #define _USE_MATH_DEFINES
 
@@ -46,12 +49,13 @@ Bala bul;
 vector<Enemigo *> vectorEnemigos;
 int puntos = 0;
 float dificultad = 1, aumento = 100;
-bool boss = false;
+int boss = 0;
 int vidas = 0;
 int menu = 1;
 
-GLuint backgroundMenu;
+static Sound* musicaFondo;
 GLuint texturasMain[6];
+bool soundActive = true;
 
 //  variables para inicializar luces
 
@@ -76,6 +80,10 @@ float light_ambient1 [] = {0.2,0.2,0.2,1.0};
 float light_diffuse_specular1 [] = {0.8,0.8,0.8,1.0};
 float light_posDOT [] = {0.0,0.0,-900.0, 1.0};
 float colorDOT [] = {1.0,1.0,1.0,1.0};
+
+//sonido
+ALCdevice *alDevice = NULL;
+ALCcontext *alContext = NULL;
 
 
 void escribirTexto(std::string texto, double x, double y, void * font)
@@ -116,15 +124,10 @@ void pintarMarcador()
     }
     
     //agrega cubo gigante boss
-    if (puntos%500 == 0 && puntos > 0) {
-        if (boss) {
-            Enemigo *auxenemigo = new Enemigo((rand()%screenWidth/2)-screenWidth, (rand()%screenHeight)-screenHeight/2, 10);
-            vectorEnemigos.push_back(auxenemigo);
-            boss = false;
-        }
-    }
-    else {
-        boss = true;
+    if (boss > 500) {
+        Enemigo *auxenemigo = new Enemigo((rand()%screenWidth/2)-screenWidth, (rand()%screenHeight)-screenHeight/2, 10);
+        vectorEnemigos.push_back(auxenemigo);
+        boss = 0;
     }
         
     stringstream puntaje;
@@ -395,17 +398,22 @@ void moverBalas(){
     glFlush();
 }
 
+//se crea la bala
 void crearBala (int dir)
 {
     if (bullet < 10) {
-        
         bullet++;
         int auxbullet = bullet;
         int continuaWhile = 1;
         Bala auxBala = Bala(xa, ya, dir);
         while (continuaWhile) {
             if (arregloBalas[auxbullet].viva == 0) {
+                //agrega la bala al arreglo
                 arregloBalas[auxbullet] = auxBala;
+                //sonido de bala
+                if (soundActive) {
+                    arregloBalas[auxbullet].sonido->play();
+                }
                 continuaWhile = 0;
             }
             else if (auxbullet < sizeof(arregloBalas)/sizeof(*arregloBalas)-1)
@@ -431,6 +439,49 @@ void reshape (int a, int h)
     
 }
 
+void crearEnemigos(int v)
+{
+    if (menu == 0 && vidas > 0) {
+        int cantidadEnemigos = 10*dificultad;
+        if (vectorEnemigos.size() < cantidadEnemigos) {
+            int tipoRandom = rand()%100+1;
+            if (tipoRandom < 50) {
+                tipoRandom = 1;
+            }
+            else if (tipoRandom < 80){
+                tipoRandom = 2;
+            }
+            else if (tipoRandom <= 100){
+                tipoRandom = 3;
+            }
+            Enemigo *auxenemigo = new Enemigo();
+            //lado izq
+            if (auxenemigo->lado == 1) {
+                auxenemigo = new Enemigo((rand()%screenWidth/2)-screenWidth, (rand()%screenHeight)-screenHeight/2, tipoRandom);
+                vectorEnemigos.push_back(auxenemigo);
+            }
+            //lado arriba
+            else if (auxenemigo->lado == 2) {
+                auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight/2)-screenHeight, tipoRandom);
+                vectorEnemigos.push_back(auxenemigo);
+            }
+            //lado der
+            else if (auxenemigo->lado == 3) {
+                auxenemigo = new Enemigo((rand()%screenWidth)+screenWidth/2, (rand()%screenHeight)-screenHeight/2, tipoRandom);
+                vectorEnemigos.push_back(auxenemigo);
+            }
+            //lado abajo
+            else if (auxenemigo->lado == 4) {
+                auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight)+screenHeight/2, tipoRandom);
+                vectorEnemigos.push_back(auxenemigo);
+            }
+        }
+        
+        glutPostRedisplay();
+        glutTimerFunc(500, crearEnemigos, 1);
+    }
+}
+
 void myMouse(int button, int state, int mouseX, int mouseY)
 {
     x = mouseX;
@@ -442,13 +493,24 @@ void myMouse(int button, int state, int mouseX, int mouseY)
                     if (x > -119+screenWidth/2 && x < 119+screenWidth/2 && y > -66+screenHeight/2 && y < 66+screenHeight/2) {
                         menu = 0;
                         vidas = 3;
+                        glutTimerFunc(500, crearEnemigos, 1);
                     }
-                    if (x > -184+screenWidth/2 && x < 184+screenWidth/2 && y > -126+screenHeight/2 && y < 126+screenHeight/2) {
-                        cout <<"entra";
+                    else if (x > -184+screenWidth/2 && x < 184+screenWidth/2 && y > -126+screenHeight/2 && y < 126+screenHeight/2) {
+                        menu = 3;
+                    }
+                    else if (x > -54+screenWidth-90 && x < 54+screenWidth-90 && y > -16+40 && y < 16+40) {
+                        menu = 5;
                     }
                     break;
                 case 2:
+                    menu = 0;
+                    vidas = 3;
+                    glutTimerFunc(500, crearEnemigos, 1);
+                    break;
+                case 3:
+                case 5:
                     menu = 1;
+                    break;
                 default:
                     break;
             }
@@ -470,16 +532,20 @@ void myKeyboard(unsigned char key, int mouseX, int mouseY)
                 break;
             case 'A':
             case 'a':
-                crearBala(1); break;
+                crearBala(1);
+                break;
             case 'W':
             case 'w':
-                crearBala(2); break;
+                crearBala(2);
+                break;
             case 'D':
             case 'd':
-                crearBala(3); break;
+                crearBala(3);
+                break;
             case 'S':
             case 's':
-                crearBala(4); break;
+                crearBala(4);
+                break;
         }
     }
 }
@@ -493,47 +559,6 @@ void myPasMouse(int mouseX, int mouseY)
         xd=x-screenWidth/2;
         yd=y-screenHeight/2;
     }
-}
-
-void crearEnemigos(int v)
-{
-    int cantidadEnemigos = 10*dificultad;
-    if (vectorEnemigos.size() < cantidadEnemigos) {
-        int tipoRandom = rand()%100+1;
-        if (tipoRandom < 50) {
-            tipoRandom = 1;
-        }
-        else if (tipoRandom < 80){
-            tipoRandom = 2;
-        }
-        else if (tipoRandom <= 100){
-            tipoRandom = 3;
-        }
-        Enemigo *auxenemigo = new Enemigo();
-        //lado izq
-        if (auxenemigo->lado == 1) {
-            auxenemigo = new Enemigo((rand()%screenWidth/2)-screenWidth, (rand()%screenHeight)-screenHeight/2, tipoRandom);
-            vectorEnemigos.push_back(auxenemigo);
-        }
-        //lado arriba
-        else if (auxenemigo->lado == 2) {
-            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight/2)-screenHeight, tipoRandom);
-            vectorEnemigos.push_back(auxenemigo);
-        }
-        //lado der
-        else if (auxenemigo->lado == 3) {
-            auxenemigo = new Enemigo((rand()%screenWidth)+screenWidth/2, (rand()%screenHeight)-screenHeight/2, tipoRandom);
-            vectorEnemigos.push_back(auxenemigo);
-        }
-        //lado abajo
-        else if (auxenemigo->lado == 4) {
-            auxenemigo = new Enemigo((rand()%screenWidth)-screenWidth/2, (rand()%screenHeight)+screenHeight/2, tipoRandom);
-            vectorEnemigos.push_back(auxenemigo);
-        }
-    }
-    
-    glutPostRedisplay();
-    glutTimerFunc(500, crearEnemigos, 1);
 }
 
 int revisarColisionBalas(int vec)
@@ -627,6 +652,7 @@ void dibujarEnemigos()
                 else if(colicionBalas == 1 && vectorEnemigos.at(n)->vida == 0){
                     
                     puntos += vectorEnemigos.at(n)->tipo*5;
+                    boss += vectorEnemigos.at(n)->tipo*5;
                     vectorEnemigos.erase(vectorEnemigos.begin()+n);
                     tam--;
                     n--;
@@ -776,6 +802,7 @@ void botonStart(){
     glEnd();
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_TEXTURE);
     //hace el bind de la textura
     glPushMatrix();
     glColorMaterial(GL_FRONT,GL_EMISSION);
@@ -785,8 +812,6 @@ void botonStart(){
     glDepthMask(false);
     
     //se carga imagen
-    Image* image = loadBMP("Images/start.bmp");
-    loadTextureMain(image, 0);
     glBindTexture(GL_TEXTURE_2D, texturasMain[0]);
     //se dibuja imagen con textura
     glBegin(GL_POLYGON);
@@ -854,9 +879,7 @@ void botonHowto(){
     glDepthMask(false);
     
     //se carga imagen
-    Image* image = loadBMP("Images/howto.bmp");
-    loadTextureMain(image, 0);
-    glBindTexture(GL_TEXTURE_2D, texturasMain[0]);
+    glBindTexture(GL_TEXTURE_2D, texturasMain[1]);
     //se dibuja imagen con textura
     glBegin(GL_POLYGON);
     glTexCoord2f( 0, 0 );
@@ -893,10 +916,112 @@ void botonHowto(){
     glDisable(GL_COLOR_MATERIAL);
 }
 
+void botonAbout(){
+    glEnable(GL_COLOR_MATERIAL);
+    
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glTranslated(screenWidth/2-90, -screenHeight/2+40, 0);
+    //hace hexagono negro
+    glPushMatrix();
+    glBegin(GL_POLYGON);
+    float colorHex [] = {0,0,0,0};
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorHex);
+    glVertex2f( -67, 0 );
+    glVertex2f( -52, -14 );
+    glVertex2f( 52, -14 );
+    glVertex2d( 67, 0);
+    glVertex2f( 52, 14 );
+    glVertex2d( -52, 14);
+    glEnd();
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    //hace el bind de la textura
+    glPushMatrix();
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glEnable(GL_TEXTURE_2D);
+    glLoadIdentity();
+    glDepthMask(false);
+    
+    //se carga imagen
+    glBindTexture(GL_TEXTURE_2D, texturasMain[2]);
+    //se dibuja imagen con textura
+    glBegin(GL_POLYGON);
+    glTexCoord2f( 0, 0 );
+    glVertex2d( -50, -12 );
+    glTexCoord2f( 1, 0 );
+    glVertex2d( 50, -12 );
+    glTexCoord2f( 1, 1 );
+    glVertex2d( 50, 12 );
+    glTexCoord2f( 0, 1);
+    glVertex2d( -50, 12 );
+    glEnd();
+    glColor4fv(mat_emission);
+    
+    glDepthMask( true );
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    //hace el hexagono blanco
+    glPushMatrix();
+    glDisable(GL_TEXTURE_2D);
+    glColorMaterial(GL_FRONT,GL_EMISSION);
+    glColor4fv(colorDOT);
+    glBegin(GL_POLYGON);
+    glVertex2f( -70, 0 );
+    glVertex2f( -54, -16 );
+    glVertex2f( 54, -16 );
+    glVertex2d( 70, 0);
+    glVertex2f( 54, 16 );
+    glVertex2d( -54, 16);
+    glEnd();
+    
+    glPopMatrix();
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_COLOR_MATERIAL);
+}
+
+
 void pintaMenu(){
     pintaLogo();
     botonStart();
     botonHowto();
+    botonAbout();
+}
+
+void procesaMenu(int val){
+    switch (val) {
+        case 1:
+            menu = 4;
+            break;
+        case 2:
+            if (soundActive) {
+                musicaFondo->stop();
+                soundActive = false;
+            }
+            else {
+                soundActive = true;
+            }
+            break;
+        case 20:
+            exit(0);
+            break;
+        default:
+            break;
+    }
+}
+
+void addMenues(int val){
+    int mainMenu;
+    mainMenu = glutCreateMenu(procesaMenu);
+    glutSetMenu(mainMenu);
+    glutAddMenuEntry("Main Menu", 1);
+    glutAddMenuEntry("Sonido", 2);
+    glutAddMenuEntry("Salir", 20);
+    glutSetMenu(mainMenu);
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 void display()
@@ -904,6 +1029,11 @@ void display()
     //quita el cursor
     glutSetCursor(GLUT_CURSOR_NONE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //activa musica de fondo
+    if (soundActive) {
+        musicaFondo->play();
+    }
+    
     //genera el grid de background
     crearGrid();
     if (menu == 1) {
@@ -952,6 +1082,7 @@ void display()
         glVertex2d( -175, 94);
         glEnd();
         glPopMatrix();
+        
         glMatrixMode(GL_MODELVIEW);
         //hace el bind de la textura
         glPushMatrix();
@@ -962,9 +1093,7 @@ void display()
         glDepthMask(false);
         
         //se carga imagen
-        Image* image = loadBMP("Images/gameover.bmp");
-        loadTextureMain(image, 0);
-        glBindTexture(GL_TEXTURE_2D, texturasMain[0]);
+        glBindTexture(GL_TEXTURE_2D, texturasMain[3]);
         //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         //se dibuja imagen con textura
         glBegin(GL_POLYGON);
@@ -1001,8 +1130,103 @@ void display()
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
         glDisable(GL_COLOR_MATERIAL);
-        
+        escribirTexto("Click to play again.", -65, -screenHeight/2+20, GLUT_BITMAP_TIMES_ROMAN_24);
         escribirTexto("Your Score: " + puntaje.str(), -55, -25, GLUT_BITMAP_TIMES_ROMAN_24);
+    }
+    //muestra how to
+    else if (menu == 3) {
+        glEnable(GL_COLOR_MATERIAL);
+        
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        
+        glMatrixMode(GL_MODELVIEW);
+        //hace el bind de la textura
+        glPushMatrix();
+        glColorMaterial(GL_FRONT,GL_EMISSION);
+        glColor4fv(colorDOT);
+        glEnable(GL_TEXTURE_2D);
+        glLoadIdentity();
+        glDepthMask(false);
+        
+        //se carga imagen
+        glBindTexture(GL_TEXTURE_2D, texturasMain[4]);
+        //se dibuja imagen con textura
+        glBegin(GL_POLYGON);
+        glTexCoord2f( 0, 0 );
+        glVertex2d( -screenWidth/2, -screenHeight/2 );
+        glTexCoord2f( 1, 0 );
+        glVertex2d( screenWidth/2, -screenHeight/2 );
+        glTexCoord2f( 1, 1 );
+        glVertex2d( screenWidth/2, screenHeight/2 );
+        glTexCoord2f( 0, 1);
+        glVertex2d( -screenWidth/2, screenHeight/2 );
+        glEnd();
+        glColor4fv(mat_emission);
+        
+        glDepthMask( true );
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        glDisable(GL_COLOR_MATERIAL);
+    }
+    //regresa al main menu
+    else if (menu == 4){
+        vectorEnemigos.clear();
+        for (int index = 0; index < sizeof(arregloBalas)/sizeof(*arregloBalas); index++) {
+            arregloBalas[index].viva = 0;
+        }
+        xa = 0;
+        ya = 0;
+        hit = 0;
+        carga = M_PI*2;
+        light_posDOT[0] = 0;
+        light_posDOT[1] = 0;
+        colorDOT[0] = 1;
+        colorDOT[1] = 1;
+        colorDOT[2] = 1;
+        menu = 1;
+    }
+    //muestra about
+    else if (menu == 5) {
+        glEnable(GL_COLOR_MATERIAL);
+        
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        
+        glMatrixMode(GL_MODELVIEW);
+        //hace el bind de la textura
+        glPushMatrix();
+        glColorMaterial(GL_FRONT,GL_EMISSION);
+        glColor4fv(colorDOT);
+        glEnable(GL_TEXTURE_2D);
+        glLoadIdentity();
+        glDepthMask(false);
+        
+        //se carga imagen
+        glBindTexture(GL_TEXTURE_2D, texturasMain[5]);
+        //se dibuja imagen con textura
+        glBegin(GL_POLYGON);
+        glTexCoord2f( 0, 0 );
+        glVertex2d( -screenWidth/2, -screenHeight/2 );
+        glTexCoord2f( 1, 0 );
+        glVertex2d( screenWidth/2, -screenHeight/2 );
+        glTexCoord2f( 1, 1 );
+        glVertex2d( screenWidth/2, screenHeight/2 );
+        glTexCoord2f( 0, 1);
+        glVertex2d( -screenWidth/2, screenHeight/2 );
+        glEnd();
+        glColor4fv(mat_emission);
+        
+        glDepthMask( true );
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        glDisable(GL_COLOR_MATERIAL);
     }
     //dibuja Juego
     else if (vidas > 0) {
@@ -1047,6 +1271,36 @@ void init(){
     glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE, mat_ambient_diffuse);
     glMaterialfv(GL_FRONT,GL_SPECULAR,mat_specular);
     glMaterialf(GL_FRONT,GL_SHININESS,mat_shininess);
+    
+    //inicializa sonido
+    alDevice = alcOpenDevice(NULL);
+    if (!alDevice) {
+        cout << "No OpenAL Device" << endl;
+    }
+    else {
+        alContext = alcCreateContext(alDevice, NULL);
+        alcMakeContextCurrent(alContext);
+    }
+    //carga musica de fondo
+    musicaFondo = Sound::loadWave("Background.wav");
+    glEnable(GL_TEXTURE_2D);
+    glGenTextures(6, texturasMain);
+    
+    
+    //cargar texturas
+    Image* image = loadBMP("Images/start.bmp");
+    loadTextureMain(image, 0);
+    image = loadBMP("Images/howto.bmp");
+    loadTextureMain(image, 1);
+    image = loadBMP("Images/about.bmp");
+    loadTextureMain(image, 2);
+    image = loadBMP("Images/gameover.bmp");
+    loadTextureMain(image, 3);
+    image = loadBMP("Images/howtolarge.bmp");
+    loadTextureMain(image, 4);
+    image = loadBMP("Images/aboutdisplay.bmp");
+    loadTextureMain(image, 5);
+    delete image;
 }
 
 int main(int argc, char** argv)
@@ -1064,13 +1318,13 @@ int main(int argc, char** argv)
     init();
     glPointSize( 20.0 );
     glutTimerFunc(20,time,1);
-    glutTimerFunc(500, crearEnemigos, 1);
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutIgnoreKeyRepeat(1);
     glutMouseFunc(myMouse);
     glutKeyboardFunc(myKeyboard);
     glutPassiveMotionFunc(myPasMouse);
+    addMenues(1);
 	glutMainLoop();
 	return 0;
 }

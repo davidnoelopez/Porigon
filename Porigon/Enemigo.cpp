@@ -15,12 +15,31 @@
 
 using namespace std;
 
-static GLuint texturas[6];
+static GLuint textura;
+
+//Makes the image into a texture, and returns the id of the texture
+void loadTexture(Image* image){
+    glBindTexture(GL_TEXTURE_2D, textura);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+}
 
 Enemigo::Enemigo ()
 {
     tipo = -1;
     lado = rand()%4+1;
+    string textura;
+    textura = "Images/Textura1.bmp";
+    Image* image = loadBMP(textura.c_str());
+    loadTexture(image);
+    delete image;
 }
 
 Enemigo::Enemigo ( float posx, float posy, int t)
@@ -62,38 +81,19 @@ Enemigo::Enemigo ( float posx, float posy, int t)
     }
 }
 
-//Makes the image into a texture, and returns the id of the texture
-void loadTexture(Image* image, int k){
-    glBindTexture(GL_TEXTURE_2D, texturas[k]);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
-}
-
 void Enemigo::dibuja(float xa, float ya){
     if (&tipo != NULL) {
         glEnable(GL_TEXTURE_2D);
-        string textura;
         switch (tipo) {
                 //dibuja triangulo
             case 1:
             {
                 float focus_emission [] = {0.0,0.0,1.0,1.0};
-                textura = "Images/Textura1.bmp";
-                Image* image = loadBMP(textura.c_str());
-                loadTexture(image, 0);
-                
-                glBindTexture(GL_TEXTURE_2D, texturas[0]);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 
                 double angulo = atan2((ya - y), (xa - x)) * 180 / M_PI;
                 glPushMatrix();
+                glBindTexture(GL_TEXTURE_2D, textura);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTranslatef(x, y, 0);
                 glRotated(angulo-90, 0, 0, 1);
                 //pone color
@@ -110,6 +110,7 @@ void Enemigo::dibuja(float xa, float ya){
                 glEnd();
                 glDisable(GL_COLOR_MATERIAL);
                 glPopMatrix();
+                
                 break;
             }
                 //dibuja cuadro
@@ -128,15 +129,10 @@ void Enemigo::dibuja(float xa, float ya){
                     focus_emission[2] = 0.0;
                 }
                 
-                textura = "Images/Textura1.bmp";
-                Image* image = loadBMP(textura.c_str());
-                loadTexture(image, 0);
-                
-                glBindTexture(GL_TEXTURE_2D, texturas[0]);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                
                 double angulo = atan2((ya - y), (xa - x)) * 180 / M_PI;
                 glPushMatrix();
+                glBindTexture(GL_TEXTURE_2D, textura);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                 glTranslatef(x, y, 0);
                 glRotated(angulo-90, 0, 0, 1);
                 //pone color
@@ -156,7 +152,6 @@ void Enemigo::dibuja(float xa, float ya){
                 glEnd();
                 glDisable(GL_COLOR_MATERIAL);
                 glPopMatrix();
-                
                 break;
             }
                 //dibuja pentagono
@@ -174,15 +169,11 @@ void Enemigo::dibuja(float xa, float ya){
                     focus_emission[1] = 1.0;
                     focus_emission[2] = 1.0;
                 }
-                textura = "Images/Textura1.bmp";
-                Image* image = loadBMP(textura.c_str());
-                loadTexture(image, 0);
-                
-                glBindTexture(GL_TEXTURE_2D, texturas[0]);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 
                 double angulo = atan2((ya - y), (xa - x)) * 180 / M_PI;
                 glPushMatrix();
+                glBindTexture(GL_TEXTURE_2D, textura);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTranslatef(x, y, 0);
                 glRotated(angulo-90, 0, 0, 1);
                 //pone color
@@ -203,7 +194,7 @@ void Enemigo::dibuja(float xa, float ya){
                 glEnd();
                 glDisable(GL_COLOR_MATERIAL);
                 glPopMatrix();
-                
+                glDepthMask(true);
                 break;
             }
                 //dibuja cubo grande

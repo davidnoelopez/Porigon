@@ -29,4 +29,5 @@ Bala::Bala ( float posx, float posy, int dir )
     y = posy;
     direccion = dir;
     viva = 1;
+    sonido = Sound::loadWave("Disparo.wav");
 }
