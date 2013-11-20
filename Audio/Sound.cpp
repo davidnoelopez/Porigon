@@ -50,12 +50,12 @@ Sound* Sound::loadWave(const char* filename) {
     char* ChunkID = new char[4];
     fread(ChunkID, 4, sizeof(char), fp);
     
-    if (strcmp(ChunkID, "RIFF")) {
+    /*if (strcmp(ChunkID, "RIFF")) {
         delete [] ChunkID;
         cout << "Not RIFF" << endl;
         fclose(fp);
         return NULL;
-    }
+    }*/
     
     fseek(fp, 8, SEEK_SET);
     

@@ -665,7 +665,6 @@ void dibujarEnemigos()
 
 //Grid inferior
 void crearGrid(){
-    glDisable(GL_LIGHT0);
     glLightfv(GL_LIGHT1,GL_SPOT_DIRECTION,spot_dir);
     glLightfv( GL_LIGHT1, GL_POSITION, light_posDOT );
     glEnable(GL_LIGHT1);
@@ -699,7 +698,6 @@ void crearGrid(){
     glDisable(GL_COLOR_MATERIAL);
     glPopMatrix();
     glDisable(GL_LIGHT1);
-    //glEnable(GL_LIGHT0);
 }
 
 void time(int v)
@@ -1038,9 +1036,7 @@ void display()
     crearGrid();
     if (menu == 1) {
         light_posDOT[2] = -500;
-        glDisable(GL_LIGHT0);
         pintaMenu();
-        glEnable(GL_LIGHT0);
         dibujaDot();
         light_posDOT[0] = 0;
         light_posDOT[1] = 0;
